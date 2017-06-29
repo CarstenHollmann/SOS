@@ -16,7 +16,7 @@
     <bean class="org.n52.series.db.beans.ServiceEntity">
         <property name="pkid" value="1" />
         <property name="version" value="2.0" />
-        <property name="name" value="SOS RESTful Dataset Service" />
+        <property name="name" value="NeXOS TEST SOS Server" />
         <property name="noDataValues" value="-9999.0,99999,NO_DATA" />
     </bean>
 
