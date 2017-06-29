@@ -34,7 +34,7 @@
         </set>
         -->
         <subclass discriminator-value="quantity" name="QuantityDatasetEntity">
-            <property formula="3" name="numberOfDecimals" type="int" />
+            <property formula="-1" name="numberOfDecimals" type="int" />
             <!-- first value for backwards compatibility -->
             <component class="ObservationEntity" name="firstValue">
                 <property column="firsttimestamp" name="timestart" type="timestamp" insert="false" update="false" />
