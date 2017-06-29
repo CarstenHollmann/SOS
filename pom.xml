@@ -47,7 +47,7 @@
     </licenses>
     <properties>
         <!-- sos name -->
-        <conf.sos.name>52n-sos-webapp</conf.sos.name>
+        <conf.sos.name>52n-sos-nexos-test</conf.sos.name>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Source encoding during build process ** !!! DO NOT CHANGE !!! 
             ** -->
