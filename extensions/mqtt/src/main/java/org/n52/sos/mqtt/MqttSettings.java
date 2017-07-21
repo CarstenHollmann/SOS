@@ -85,13 +85,13 @@ public class MqttSettings implements SettingDefinitionProvider {
             new ChoiceSettingDefinition()
                     .setGroup(GROUP)
                     .setOrder(ORDER_3)
-                    .setKey(MQTT_DECODER)
+                    .setKey(MQTT_PROTOCOL)
                     .setDefaultValue("tcp")
                     .addOption("tcp")
                     .addOption("ws")
                     .setOptional(false)
-                    .setTitle("MQTT decoder")
-                    .setDescription("Select the decoder");
+                    .setTitle("MQTT protocol")
+                    .setDescription("Select the protocol");
     
     public static final ChoiceSettingDefinition MQTT_DECODER_DEFINITION =
             new ChoiceSettingDefinition()
