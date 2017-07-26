@@ -43,6 +43,7 @@
 					</execution>
 				</executions>
 			</plugin>
+            <!-- 
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
@@ -62,6 +63,7 @@
               </execution>
           </executions>
         </plugin>
+         -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
