@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -32,6 +32,8 @@ import org.hibernate.Session;
 import org.n52.sos.ds.hibernate.dao.DaoFactory;
 import org.n52.sos.ds.hibernate.dao.series.AbstractSeriesValueDAO;
 import org.n52.sos.ds.hibernate.dao.series.AbstractSeriesValueTimeDAO;
+import org.n52.sos.ds.hibernate.entities.series.values.SeriesValue;
+import org.n52.sos.ds.hibernate.entities.values.AbstractValue;
 import org.n52.sos.ds.hibernate.util.ObservationTimeExtrema;
 import org.n52.sos.ds.hibernate.values.AbstractHibernateStreamingValue;
 import org.n52.sos.exception.CodedException;
@@ -60,6 +62,8 @@ public abstract class HibernateSeriesStreamingValue extends AbstractHibernateStr
     protected final AbstractSeriesValueTimeDAO seriesValueTimeDAO;
 
     protected long series;
+    
+    private boolean duplicated;
 
     /**
      * constructor
@@ -68,11 +72,13 @@ public abstract class HibernateSeriesStreamingValue extends AbstractHibernateStr
      *            {@link GetObservationRequest}
      * @param series
      *            Datasource series id
+     * @param duplicated 
      * @throws CodedException
      */
-    public HibernateSeriesStreamingValue(GetObservationRequest request, long series) throws CodedException {
+    public HibernateSeriesStreamingValue(GetObservationRequest request, long series, boolean duplicated) throws CodedException {
         super(request);
         this.series = series;
+        this.duplicated = duplicated;
         this.seriesValueDAO = (AbstractSeriesValueDAO) DaoFactory.getInstance().getValueDAO();
         this.seriesValueTimeDAO = (AbstractSeriesValueTimeDAO) DaoFactory.getInstance().getValueTimeDAO();
     }
@@ -111,6 +117,17 @@ public abstract class HibernateSeriesStreamingValue extends AbstractHibernateStr
         } finally {
             sessionHolder.returnSession(s);
         }
+    }
+    
+    protected boolean checkValue(AbstractValue value) {
+        if (isDuplicated()) {
+            return value.getOfferings() != null && value.getOfferings().size() == 1;
+        }
+        return true;
+     }
+    
+    protected boolean isDuplicated() {
+        return duplicated;
     }
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -28,19 +28,17 @@
  */
 package org.n52.sos.ds.datasource;
 
+import com.google.common.collect.Sets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.settings.StringSettingDefinition;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
 import org.n52.sos.util.JavaHelper;
 import org.n52.sos.util.StringHelper;
-
-import com.google.common.collect.Sets;
 
 
 public abstract class AbstractHibernateFullDBDatasource extends AbstractHibernateDatasource {
@@ -91,7 +89,8 @@ public abstract class AbstractHibernateFullDBDatasource extends AbstractHibernat
                         createPortDefinition(JavaHelper.asInteger(settings.get(PORT_KEY))),
                         createMinPoolSizeDefinition(JavaHelper.asInteger(settings.get(MIN_POOL_SIZE_KEY))),
                         createMaxPoolSizeDefinition(JavaHelper.asInteger(settings.get(MAX_POOL_SIZE_KEY))),
-                        createBatchSizeDefinition(JavaHelper.asInteger(settings.get(BATCH_SIZE_KEY))));
+                        createBatchSizeDefinition(JavaHelper.asInteger(settings.get(BATCH_SIZE_KEY))),
+                        createTimeZoneDefinition((String) settings.get(TIMEZONE_KEY)));
         if (supportsSchema) {
             settingDefinitions.add(schemaSetting);
         }
@@ -128,6 +127,8 @@ public abstract class AbstractHibernateFullDBDatasource extends AbstractHibernat
         p.put(HibernateConstants.C3P0_ACQUIRE_INCREMENT, "1");
         p.put(HibernateConstants.C3P0_TIMEOUT, "0");
         p.put(HibernateConstants.C3P0_MAX_STATEMENTS, "0");
+        p.put(HibernateConstants.C3P0_PRIVILEGE_SPAWNED_THREAD, "true");
+        p.put(HibernateConstants.C3P0_CONTEXT_CLASS_LOADER_SOURCE, "library");
         if (settings.containsKey(BATCH_SIZE_KEY)) {
             p.put(HibernateConstants.JDBC_BATCH_SIZE, settings.get(BATCH_SIZE_KEY).toString());
         }
@@ -136,6 +137,7 @@ public abstract class AbstractHibernateFullDBDatasource extends AbstractHibernat
         p.put(HibernateConstants.CONNECTION_TEST_ON_BORROW, "true");
         p.put(PROVIDED_JDBC, settings.get(PROVIDED_JDBC_DRIVER_KEY).toString());
         p.put(DATABASE_CONCEPT_KEY, settings.get(DATABASE_CONCEPT_KEY));
+        p.put(HIBERNATE_DATASOURCE_TIMEZONE, settings.get(TIMEZONE_KEY));
         addMappingFileDirectories(settings, p);
 
         return p;
@@ -158,6 +160,7 @@ public abstract class AbstractHibernateFullDBDatasource extends AbstractHibernat
         if (supportsSchema) {
             settings.put(SCHEMA_KEY, current.getProperty(HibernateConstants.DEFAULT_SCHEMA));
         }
+        settings.put(HIBERNATE_DIRECTORY, current.get(HIBERNATE_DIRECTORY));
         settings.put(USERNAME_KEY, current.getProperty(HibernateConstants.CONNECTION_USERNAME));
         settings.put(PASSWORD_KEY, current.getProperty(HibernateConstants.CONNECTION_PASSWORD));
         settings.put(MIN_POOL_SIZE_KEY, current.getProperty(HibernateConstants.C3P0_MIN_SIZE));
@@ -169,6 +172,8 @@ public abstract class AbstractHibernateFullDBDatasource extends AbstractHibernat
         settings.put(DATABASE_CONCEPT_KEY,  current.getProperty(DATABASE_CONCEPT_KEY));
         settings.put(PROVIDED_JDBC_DRIVER_KEY,
                 current.getProperty(PROVIDED_JDBC, PROVIDED_JDBC_DRIVER_DEFAULT_VALUE.toString()));
+
+        settings.put(TIMEZONE_KEY, current.getProperty(HIBERNATE_DATASOURCE_TIMEZONE));
         final String url = current.getProperty(HibernateConstants.CONNECTION_URL);
 
         final String[] parsed = parseURL(url);

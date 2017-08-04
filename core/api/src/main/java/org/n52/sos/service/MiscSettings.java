@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -189,7 +189,7 @@ public class MiscSettings implements SettingDefinitionProvider {
                     .setGroup(GROUP)
                     .setOrder(ORDER_16)
                     .setKey(RETURN_OVERALL_EXTREMA_FOR_FIRST_LATEST)
-                    .setDefaultValue(true)
+                    .setDefaultValue(false)
                     .setTitle("Should the SOS return overall extrema?")
                     .setDescription(
                             "Should the SOS return overall extrema for first/latest observation queries or for each time series");

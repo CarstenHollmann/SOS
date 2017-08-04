@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -31,6 +31,9 @@ package org.n52.sos.response;
 import java.util.Collections;
 import java.util.List;
 
+import org.n52.sos.ogc.gml.time.Time;
+import org.n52.sos.ogc.gml.time.TimeInstant;
+import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.request.ResponseFormat;
 import org.n52.sos.util.StringHelper;
@@ -50,6 +53,8 @@ public abstract class AbstractObservationResponse extends AbstractServiceRespons
     private String resultModel;
 
     private boolean mergeObservation = false;
+
+    private GlobalGetObservationValues globalValues;
 
     public List<OmObservation> getObservationCollection() {
         return Collections.unmodifiableList(observationCollection);
@@ -111,6 +116,53 @@ public abstract class AbstractObservationResponse extends AbstractServiceRespons
 
     public boolean isSetMergeObservation() {
         return mergeObservation;
+    }
+    
+    public AbstractObservationResponse setGlobalValues(GlobalGetObservationValues globalValues) {
+        this.globalValues = globalValues;
+        return this;
+    }
+    
+    public GlobalGetObservationValues getGlobalValues() {
+        return globalValues;
+    }
+    
+    public boolean hasGlobalValues() {
+        return getGlobalValues() != null && !getGlobalValues().isEmpty();
+    }
+
+    public class GlobalGetObservationValues {
+        private Time phenomenonTime;
+        
+        public GlobalGetObservationValues addPhenomenonTime(Time phenomenonTime) {
+            if (isSetPhenomenonTime()) {
+                if (phenomenonTime instanceof TimeInstant) {
+                    this.phenomenonTime = new TimePeriod(this.phenomenonTime, this.phenomenonTime);
+                }
+                ((TimePeriod)this.phenomenonTime).extendToContain(phenomenonTime);
+            } else {
+                this.phenomenonTime = phenomenonTime;
+            }
+            return this;
+        }
+        
+        public GlobalGetObservationValues setPhenomenonTime(Time phenomenonTime) {
+            this.phenomenonTime = phenomenonTime;
+            return this;
+        }
+        
+        public Time getPhenomenonTime() {
+            return phenomenonTime;
+        }
+        
+        public boolean isSetPhenomenonTime() {
+            return getPhenomenonTime() != null && !getPhenomenonTime().isEmpty();
+        }
+        
+        public boolean isEmpty() {
+            return !isSetPhenomenonTime();
+        }
+    
     }
 
 }

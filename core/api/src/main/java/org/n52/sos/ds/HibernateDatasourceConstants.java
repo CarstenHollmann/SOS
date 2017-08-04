@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -77,6 +77,8 @@ public interface HibernateDatasourceConstants {
     String HIBERNATE_DRIVER_CLASS = "hibernate.connection.driver_class";
     
     String HIBERNATE_DEFAULT_OGM_PACKAGE = "org.n52.sos.ds.hibernate.ogm.entities";
+    
+    String HIBERNATE_DATASOURCE_TIMEZONE = "hibernate.datasource.timezone";
     
     public enum DatabaseConcept {
         OLD_CONCEPT("Old concept"),

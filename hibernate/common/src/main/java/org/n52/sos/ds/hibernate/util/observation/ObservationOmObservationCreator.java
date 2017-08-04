@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.xmlbeans.XmlObject;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -43,6 +44,7 @@ import org.n52.sos.convert.ConverterException;
 import org.n52.sos.ds.hibernate.dao.ObservationConstellationDAO;
 import org.n52.sos.ds.hibernate.entities.AbstractObservation;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
+import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.interfaces.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.interfaces.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.interfaces.CategoryObservation;
@@ -51,6 +53,10 @@ import org.n52.sos.ds.hibernate.entities.interfaces.GeometryObservation;
 import org.n52.sos.ds.hibernate.entities.interfaces.NumericObservation;
 import org.n52.sos.ds.hibernate.entities.interfaces.SweDataArrayObservation;
 import org.n52.sos.ds.hibernate.entities.interfaces.TextObservation;
+import org.n52.sos.ds.hibernate.entities.series.Series;
+import org.n52.sos.ds.hibernate.entities.series.SeriesObservation;
+import org.n52.sos.ds.hibernate.util.HibernateGeometryCreator;
+import org.n52.sos.ds.hibernate.util.HibernateHelper;
 import org.n52.sos.exception.CodedException;
 import org.n52.sos.ogc.gml.AbstractFeature;
 import org.n52.sos.ogc.gml.CodeWithAuthority;
@@ -90,7 +96,7 @@ import com.google.common.collect.Sets;
  */
 public class ObservationOmObservationCreator extends AbstractOmObservationCreator {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObservationOmObservationCreator.class);
-
+    
     private final Collection<AbstractObservation> observations;
 
     private final AbstractObservationRequest request;
@@ -181,19 +187,24 @@ public class ObservationOmObservationCreator extends AbstractOmObservationCreato
         String procedureId = createProcedure(hObservation);
         String featureId = createFeatureOfInterest(hObservation);
         String phenomenonId = createPhenomenon(hObservation);
+        Set<String> offerings = createOfferingSet(hObservation, procedureId, phenomenonId);
         final Value<?> value = getValueFromObservation(hObservation);
         OmObservation sosObservation = null;
         if (value != null) {
             if (hObservation.getUnit() != null) {
                 value.setUnit(hObservation.getUnit().getUnit());
+            } else if (hObservation instanceof SeriesObservation && ((SeriesObservation)hObservation).getSeries().isSetUnit()) {
+                value.setUnit(queryUnit(((SeriesObservation)hObservation).getSeries()));
             }
             checkOrSetObservablePropertyUnit(getObservedProperty(phenomenonId), value.getUnit());
             OmObservationConstellation obsConst =
-                    createObservationConstellation(hObservation, procedureId, phenomenonId, featureId);
+                    createObservationConstellation(hObservation, procedureId, phenomenonId, featureId, offerings);
             sosObservation = createNewObservation(obsConst, hObservation, value);
             // add SpatialFilteringProfile
             if (hObservation.hasSamplingGeometry()) {
                 sosObservation.addParameter(createSpatialFilteringProfileParameter(hObservation.getSamplingGeometry()));
+            } else if (hObservation.isSetLongLat()) {
+                sosObservation.addParameter(createSpatialFilteringProfileParameter(new HibernateGeometryCreator().createGeometry(hObservation)));
             }
             checkForAdditionalObservationCreator(hObservation, sosObservation);
             // TODO check for ScrollableResult vs
@@ -298,13 +309,7 @@ public class ObservationOmObservationCreator extends AbstractOmObservationCreato
         LOGGER.trace("Creating Phenomenon...");
         final String phenID = hObservation.getObservableProperty().getIdentifier();
         if (!observedProperties.containsKey(phenID)) {
-        	 OmObservableProperty omObservableProperty = createObservableProperty(hObservation.getObservableProperty());
-//            final String description = hObservation.getObservableProperty().getDescription();
-//            OmObservableProperty omObservableProperty = new OmObservableProperty(phenID, description, null, null);
-//            if (hObservation.getObservableProperty().isSetName()) {
-//            	omObservableProperty.setHumanReadableIdentifier(hObservation.getObservableProperty().getName());
-//            	omObservableProperty.setName(new CodeType(hObservation.getObservableProperty().getName()));
-//            }
+            OmObservableProperty omObservableProperty = createObservableProperty(hObservation.getObservableProperty());
             observedProperties.put(phenID, omObservableProperty);
         }
         LOGGER.trace("Creating Phenomenon done.");
@@ -335,23 +340,31 @@ public class ObservationOmObservationCreator extends AbstractOmObservationCreato
         return foiID;
     }
 
+    private Set<String> createOfferingSet(AbstractObservation hObservation, String procedure, String observedProperty) {
+        Set<String> offerings = Sets.newHashSet();    
+        if (hObservation instanceof SeriesObservation && ((SeriesObservation) hObservation).getSeries().isSetOffering()) {
+             offerings.add(((SeriesObservation) hObservation).getSeries().getOffering().getIdentifier());
+        } else if (hObservation.isSetOfferings()) {
+            for (Offering offering : hObservation.getOfferings()) {
+                offerings.add(offering.getIdentifier());
+            }
+        } else {
+            offerings.addAll(getCache().getOfferingsForObservableProperty(
+                            observedProperty));
+            offerings.retainAll(getCache().getOfferingsForProcedure(procedure));
+        }
+        return offerings;
+    }
+
     private OmObservationConstellation createObservationConstellation(AbstractObservation hObservation,
-            String procedureId, String phenomenonId, String featureId) {
+            String procedureId, String phenomenonId, String featureId, Set<String> offerings) {
         OmObservationConstellation obsConst =
                 new OmObservationConstellation(getProcedure(procedureId), getObservedProperty(phenomenonId),
-                        getFeature(featureId));
+                        getFeature(featureId), offerings);
         if (observationConstellations.containsKey(obsConst.hashCode())) {
             return observationConstellations.get(obsConst.hashCode());
         } else {
             int hashCode = obsConst.hashCode();
-            /* sfp the offerings to find the templates */
-            if (obsConst.getOfferings() == null) {
-                final Set<String> offerings =
-                        Sets.newHashSet(getCache().getOfferingsForObservableProperty(
-                                obsConst.getObservableProperty().getIdentifier()));
-                offerings.retainAll(getCache().getOfferingsForProcedure(obsConst.getProcedure().getIdentifier()));
-                obsConst.setOfferings(offerings);
-            }
             if (StringHelper.isNotEmpty(getResultModel())) {
                 obsConst.setObservationType(getResultModel());
             }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -274,7 +274,7 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO imp
     private List<String> queryFeatureIdentifiersForParameter(final GetFeatureOfInterestRequest req,
             final Session session) throws OwsExceptionReport {
         if (req.hasNoParameter()) {
-            return new FeatureOfInterestDAO().getFeatureOfInterestIdentifiers(session);
+            return new FeatureOfInterestDAO().getPublishedFeatureOfInterestIdentifiers(session);
         }
         if (req.containsOnlyFeatureParameter() && req.isSetFeatureOfInterestIdentifiers()) {
             final Criteria c =
@@ -365,7 +365,7 @@ public class GetFeatureOfInterestDAO extends AbstractGetFeatureOfInterestDAO imp
      */
     @SuppressWarnings("unchecked")
     private List<String> queryFeatureIdentifiersForParameterForSeries(GetFeatureOfInterestRequest req, Session session) throws CodedException {
-        final Criteria c = session.createCriteria(FeatureOfInterest.class);
+        final Criteria c = new FeatureOfInterestDAO().getPublishedFeatureOfInterestCriteria(session);
         if (req.isSetFeatureOfInterestIdentifiers()) {
             c.add(Restrictions.in(FeatureOfInterest.IDENTIFIER, req.getFeatureIdentifiers()));
         }

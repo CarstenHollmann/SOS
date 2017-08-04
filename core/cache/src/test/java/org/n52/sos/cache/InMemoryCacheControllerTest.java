@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -560,7 +560,7 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
     }
 
     @Test
-    public void should_not_contain_related_result_templates_after_DeleteSenosr() throws OwsExceptionReport {
+    public void should_not_contain_related_result_templates_after_DeleteSensor() throws OwsExceptionReport {
         updateCacheWithInsertResultTemplate(RESULT_TEMPLATE_IDENTIFIER);
         deleteSensorPreparation();
 
@@ -932,16 +932,16 @@ public class InMemoryCacheControllerTest extends AbstractCacheControllerTest {
                 .getFeatureOfInterest().getIdentifierCodeWithAuthority().getValue();
     }
 
-    private void insertObservationRequestExample(String procedure) {
+    private void insertObservationRequestExample(String procedure) throws OwsExceptionReport {
         insertObservationRequestExample(procedure, System.currentTimeMillis());
     }
 
-    private void insertObservationRequestExample(String procedure, long phenomenonTime) {
+    private void insertObservationRequestExample(String procedure, long phenomenonTime) throws OwsExceptionReport {
         insertObservationRequestExample(procedure, 11.0, 22.0, Constants.EPSG_WGS84, FEATURE, phenomenonTime);
     }
 
     private void insertObservationRequestExample(String procedure, double xCoord, double yCoord, int epsgCode,
-            String feature, long phenomenonTime) {
+            String feature, long phenomenonTime) throws OwsExceptionReport {
         request =
                 aInsertObservationRequest()
                         .setProcedureId(procedure)

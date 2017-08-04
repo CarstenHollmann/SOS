@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -31,18 +31,21 @@ package org.n52.sos.ds.hibernate.util.observation;
 import java.util.List;
 import java.util.Locale;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.n52.sos.cache.ContentCache;
 import org.n52.sos.convert.ConverterException;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.FeatureQueryHandlerQueryObject;
 import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
+import org.n52.sos.ds.hibernate.entities.AbstractIdentifierNameDescriptionEntity;
 import org.n52.sos.ds.hibernate.entities.AbstractObservation;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.Procedure;
+import org.n52.sos.ds.hibernate.entities.series.Series;
+import org.n52.sos.ds.hibernate.util.HibernateHelper;
 import org.n52.sos.ds.hibernate.util.procedure.HibernateProcedureConverter;
 import org.n52.sos.ogc.gml.AbstractFeature;
-import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.ReferenceType;
 import org.n52.sos.ogc.om.NamedValue;
 import org.n52.sos.ogc.om.OmConstants;
@@ -57,6 +60,8 @@ import org.n52.sos.service.Configurator;
 import org.n52.sos.service.ServiceConfiguration;
 import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.GeometryHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -67,6 +72,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * @since 4.0.0
  */
 public abstract class AbstractOmObservationCreator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractOmObservationCreator.class);
+    protected static final String SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES = "getUnitForObservablePropertyProcedureSeries";
+    protected static final String SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES = "getUnitForObservablePropertySeries";
     private final AbstractObservationRequest request;
     private final Session session;
     private final Locale i18n;
@@ -154,7 +162,7 @@ public abstract class AbstractOmObservationCreator {
         OmObservableProperty omObservableProperty = new OmObservableProperty(phenID, description, null, null);
         if (observableProperty.isSetName()) {
         	omObservableProperty.setHumanReadableIdentifier(observableProperty.getName());
-        	omObservableProperty.setName(new CodeType(observableProperty.getName()));
+        	addName(omObservableProperty, observableProperty);
         }
         return omObservableProperty;
     }
@@ -180,9 +188,22 @@ public abstract class AbstractOmObservationCreator {
                     new SosProcedureDescriptionUnknowType(identifier, pdf, null);
             if (hProcedure.isSetName()) {
                 sosProcedure.setHumanReadableIdentifier(hProcedure.getName());
+                addName(sosProcedure, hProcedure);
             }
             return sosProcedure;
         }
+    }
+    
+    /**
+     * @param abstractFeature
+     * @param hAbstractFeature
+     */
+    protected void addName(AbstractFeature abstractFeature, AbstractIdentifierNameDescriptionEntity hAbstractFeature) {
+        if (hAbstractFeature.isSetCodespaceName()) {
+            abstractFeature.addName(hAbstractFeature.getName(), hAbstractFeature.getCodespaceName().getCodespace());
+        }
+        abstractFeature.addName(hAbstractFeature.getName());
+        
     }
     
     /**
@@ -218,6 +239,30 @@ public abstract class AbstractOmObservationCreator {
         if (request != null) {
             return request.getVersion();
         }
+        return null;
+    }
+    
+    protected String queryUnit(Series series) {
+        if (series.isSetUnit()) {
+            return series.getUnit().getUnit();
+        } else if (HibernateHelper.isNamedQuerySupported(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES, getSession())) {
+            Query namedQuery = getSession().getNamedQuery(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES);
+            namedQuery.setParameter(Series.OBSERVABLE_PROPERTY,
+                    series.getObservableProperty().getIdentifier());
+            namedQuery.setParameter(Series.PROCEDURE,
+                    series.getProcedure().getIdentifier());
+            LOGGER.debug("QUERY queryUnit({}, {}) with NamedQuery '{}': {}",  series.getObservableProperty().getIdentifier(),
+                    series.getProcedure().getIdentifier(), SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES,
+                    namedQuery.getQueryString());
+            return (String) namedQuery.uniqueResult();
+        } else if (HibernateHelper.isNamedQuerySupported(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES, getSession())) {
+            Query namedQuery = getSession().getNamedQuery(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES);
+            namedQuery.setParameter(Series.OBSERVABLE_PROPERTY,
+                    series.getObservableProperty().getIdentifier());
+            LOGGER.debug("QUERY queryUnit({}) with NamedQuery '{}': {}", series.getObservableProperty().getIdentifier(),
+                    SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES, namedQuery.getQueryString());
+            return (String) namedQuery.uniqueResult();
+        } 
         return null;
     }
 }

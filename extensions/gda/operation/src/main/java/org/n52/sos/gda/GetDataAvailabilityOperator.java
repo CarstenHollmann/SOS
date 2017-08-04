@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -96,13 +96,19 @@ public class GetDataAvailabilityOperator
             exceptions.add(owse);
         }
         try {
-            checkProcedureIDs(sosRequest.getProcedures(), GetDataAvailabilityParams.procedure.name());
+            checkProcedures(sosRequest.getProcedures(), GetDataAvailabilityParams.procedure.name());
+            if (sosRequest.isSetProcedures()) {
+                sosRequest.setProcedure(addChildProcedures(sosRequest.getProcedures()));
+            }
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
         try {
             checkFeatureOfInterestIdentifiers(sosRequest.getFeaturesOfInterest(),
                     GetDataAvailabilityParams.featureOfInterest.name());
+            if (sosRequest.isSetFeaturesOfInterest()) {
+                sosRequest.setFeatureOfInterest(addChildFeatures(sosRequest.getFeaturesOfInterest()));
+            }
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }

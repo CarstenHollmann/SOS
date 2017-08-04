@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -52,6 +52,7 @@ import org.n52.sos.exception.ows.NoApplicableCodeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedEncoderInputException;
 import org.n52.sos.ogc.OGCConstants;
 import org.n52.sos.ogc.gml.AbstractFeature;
+import org.n52.sos.ogc.gml.AbstractMetaData;
 import org.n52.sos.ogc.gml.CodeType;
 import org.n52.sos.ogc.gml.GmlConstants;
 import org.n52.sos.ogc.om.features.FeatureCollection;
@@ -135,8 +136,10 @@ public class SamplingEncoderv100 extends AbstractXmlEncoder<AbstractFeature> {
     public XmlObject encode(AbstractFeature abstractFeature, Map<HelperValues, String> additionalValues)
             throws OwsExceptionReport {
         XmlObject encodedObject = createFeature(abstractFeature);
-        LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
-                XmlHelper.validateDocument(encodedObject));
+        if (LOGGER.isDebugEnabled()) {
+        	LOGGER.debug("Encoded object {} is valid: {}", encodedObject.schemaType().toString(),
+                    XmlHelper.validateDocument(encodedObject));
+        }
         return encodedObject;
     }
 
@@ -200,6 +203,7 @@ public class SamplingEncoderv100 extends AbstractXmlEncoder<AbstractFeature> {
         if (sampFeat.isSetIdentifier()
                 && SosHelper.checkFeatureOfInterestIdentifierForSosV2(sampFeat.getIdentifierCodeWithAuthority().getValue(),
                         Sos1Constants.SERVICEVERSION)) {
+            sampFeat.getIdentifierCodeWithAuthority().setCodeSpace("uniquID");
             xbSamplingFeature.addNewName().set(
                     CodingHelper.encodeObjectToXml(GmlConstants.NS_GML, sampFeat.getIdentifierCodeWithAuthority()));
         }
@@ -223,6 +227,21 @@ public class SamplingEncoderv100 extends AbstractXmlEncoder<AbstractFeature> {
             }
         } else {
             xbSamplingFeature.addNewSampledFeature().setHref(GmlConstants.NIL_UNKNOWN);
+        }
+        
+        // set metadataProperty
+        setMetaDataProperty(xbSamplingFeature, sampFeat);
+    }
+    
+    private void setMetaDataProperty(SamplingFeatureType sft, SamplingFeature sampFeat) throws OwsExceptionReport {
+        if (sampFeat.isSetMetaDataProperty()) {
+            for (AbstractMetaData abstractMetaData : sampFeat.getMetaDataProperty()) {
+                XmlObject encodeObject = CodingHelper.encodeObjectToXml(GmlConstants.NS_GML, abstractMetaData);
+                sft.addNewMetaDataProperty().set(encodeObject);
+//                XmlObject substituteElement = XmlHelper.substituteElement(
+//                        sft.addNewMetaDataProperty().addNewAbstractMetaData(), encodeObject);
+//                substituteElement.set(encodeObject);
+            }
         }
     }
 

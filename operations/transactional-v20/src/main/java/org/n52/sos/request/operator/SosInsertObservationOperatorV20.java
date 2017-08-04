@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -381,10 +381,10 @@ public class SosInsertObservationOperatorV20 extends
 
     private void checkObservationConstellationParameter(final OmObservationConstellation obsConstallation)
             throws OwsExceptionReport {
-        checkProcedureID(obsConstallation.getProcedure().getIdentifier(),
-                Sos2Constants.InsertObservationParams.procedure.name());
+        checkProcedure(obsConstallation.getProcedure().getIdentifier(),
+                Sos2Constants.InsertObservationParams.procedure.name(), true);
         checkObservedProperty(obsConstallation.getObservableProperty().getIdentifier(),
-                Sos2Constants.InsertObservationParams.observedProperty.name());
+                Sos2Constants.InsertObservationParams.observedProperty.name(), true);
     }
 
     private void checkOrSetObservationType(final OmObservation sosObservation, final boolean isSplitObservations)

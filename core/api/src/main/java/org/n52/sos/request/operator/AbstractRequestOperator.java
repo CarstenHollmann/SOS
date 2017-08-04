@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -52,11 +52,8 @@ import org.n52.sos.exception.ows.concrete.InvalidValueReferenceException;
 import org.n52.sos.exception.ows.concrete.MissingProcedureParameterException;
 import org.n52.sos.exception.ows.concrete.MissingServiceParameterException;
 import org.n52.sos.exception.ows.concrete.MissingValueReferenceException;
-import org.n52.sos.exception.ows.concrete.UnsupportedOperatorException;
 import org.n52.sos.ogc.filter.SpatialFilter;
 import org.n52.sos.ogc.filter.TemporalFilter;
-import org.n52.sos.ogc.gml.time.Time;
-import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.gml.time.TimePeriod;
 import org.n52.sos.ogc.ows.CompositeOwsException;
 import org.n52.sos.ogc.ows.OWSConstants;
@@ -112,7 +109,6 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, Q extends 
         this(service, version, operationName, true, requestType);
     }
     
-    @SuppressWarnings("unchecked")
     public AbstractRequestOperator(String service, String version, String operationName, boolean defaultActive, Class<Q> requestType) {
         this.operationName = operationName;
         this.requestOperatorKeyType = new RequestOperatorKey(service, version, operationName, defaultActive);
@@ -368,7 +364,30 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, Q extends 
      * @throws OwsExceptionReport
      *             * if the value of the sensor ID parameter is incorrect
      */
-    protected void checkProcedureID(final String procedureID, final String parameterName) throws OwsExceptionReport {
+    protected void checkProcedure(final String procedureID, final String parameterName) throws OwsExceptionReport {
+        if (Strings.isNullOrEmpty(procedureID)) {
+            throw new MissingProcedureParameterException();
+        } else if (!getCache().getPublishedProcedures().contains(procedureID)) {
+            throw new InvalidParameterValueException(parameterName, procedureID);
+        }
+    }
+
+    protected void checkProcedures(final Collection<String> procedureIDs, final String parameterName)
+            throws OwsExceptionReport {
+        if (procedureIDs != null) {
+            final CompositeOwsException exceptions = new CompositeOwsException();
+            for (final String procedureID : procedureIDs) {
+                try {
+                    checkProcedure(procedureID, parameterName);
+                } catch (final OwsExceptionReport owse) {
+                    exceptions.add(owse);
+                }
+            }
+            exceptions.throwIfNotEmpty();
+        }
+    }
+    
+    protected void checkProcedure(final String procedureID, final String parameterName, boolean all) throws OwsExceptionReport {
         if (Strings.isNullOrEmpty(procedureID)) {
             throw new MissingProcedureParameterException();
         } else if (!getCache().hasProcedure(procedureID)) {
@@ -376,13 +395,13 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, Q extends 
         }
     }
 
-    protected void checkProcedureIDs(final Collection<String> procedureIDs, final String parameterName)
+    protected void checkProcedures(final Collection<String> procedureIDs, final String parameterName, boolean all)
             throws OwsExceptionReport {
         if (procedureIDs != null) {
             final CompositeOwsException exceptions = new CompositeOwsException();
             for (final String procedureID : procedureIDs) {
                 try {
-                    checkProcedureID(procedureID, parameterName);
+                    checkProcedure(procedureID, parameterName, all);
                 } catch (final OwsExceptionReport owse) {
                     exceptions.add(owse);
                 }
@@ -439,7 +458,7 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, Q extends 
         if (featureOfInterest == null || featureOfInterest.isEmpty()) {
             throw new MissingParameterValueException(parameterName);
         }
-        if (getCache().hasFeatureOfInterest(featureOfInterest)) {
+        if (getCache().getPublishedFeatureOfInterest().contains(featureOfInterest)) {
             return;
         }
         if (getCache().hasRelatedFeature(featureOfInterest) && getCache().isRelatedFeatureSampled(featureOfInterest)) {
@@ -462,14 +481,40 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, Q extends 
             exceptions.throwIfNotEmpty();
         }
     }
+    
+    protected void checkObservedProperties(final List<String> observedProperties, final String parameterName, boolean all)
+            throws OwsExceptionReport {
+        if (observedProperties != null) {
+            final CompositeOwsException exceptions = new CompositeOwsException();
+            for (final String observedProperty : observedProperties) {
+                try {
+                    checkObservedProperty(observedProperty, parameterName, all);
+                } catch (final OwsExceptionReport e) {
+                    exceptions.add(e);
+                }
+            }
+            exceptions.throwIfNotEmpty();
+        }
+    }
 
     protected void checkObservedProperty(final String observedProperty, final String parameterName)
+            throws OwsExceptionReport {
+        checkObservedProperty(observedProperty, parameterName, false);
+    }
+    
+    protected void checkObservedProperty(final String observedProperty, final String parameterName, boolean all)
             throws OwsExceptionReport {
         if (observedProperty == null || observedProperty.isEmpty()) {
             throw new MissingParameterValueException(parameterName);
         }
-        if (!getCache().hasObservableProperty(observedProperty)) {
-            throw new InvalidParameterValueException(parameterName, observedProperty);
+        if (all) {
+            if (!getCache().hasObservableProperty(observedProperty)) {
+                throw new InvalidParameterValueException(parameterName, observedProperty);
+            }
+        } else {
+            if (!getCache().getPublishedObservableProperties().contains(observedProperty)) {
+                throw new InvalidParameterValueException(parameterName, observedProperty);
+            }
         }
     }
 
@@ -477,14 +522,23 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, Q extends 
             throws OwsExceptionReport {
         checkObservedProperty(observedProperty, parameterName.name());
     }
+    
+    protected void checkObservedProperty(final String observedProperty, final Enum<?> parameterName, boolean all)
+            throws OwsExceptionReport {
+        checkObservedProperty(observedProperty, parameterName.name(), all);
+    }
 
-    protected void checkOfferings(final Collection<String> offerings, final String parameterName)
+    protected void checkOfferings(final Collection<String> offerings, final String parameterName) throws OwsExceptionReport {
+        checkOfferings(offerings, parameterName, false);
+    }
+    
+    protected void checkOfferings(final Collection<String> offerings, final String parameterName, boolean all)
             throws OwsExceptionReport {
         if (offerings != null) {
             final CompositeOwsException exceptions = new CompositeOwsException();
             for (final String offering : offerings) {
                 try {
-                    checkOffering(offering, parameterName);
+                    checkOffering(offering, parameterName, all);
                 } catch (final OwsExceptionReport e) {
                     exceptions.add(e);
                 }
@@ -496,18 +550,29 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, Q extends 
     protected void checkOfferings(Collection<String> offerings, Enum<?> parameterName) throws OwsExceptionReport {
         checkOfferings(offerings, parameterName.name());
     }
-
-    protected void checkOffering(final String offering, final String parameterName) throws OwsExceptionReport {
-        if (offering == null || offering.isEmpty()) {
-            throw new MissingParameterValueException(parameterName);
-        }
-        if (!getCache().hasOffering(offering)) {
-            throw new InvalidParameterValueException(parameterName, offering);
-        }
+    
+    protected void checkOfferings(Collection<String> offerings, Enum<?> parameterName, boolean all) throws OwsExceptionReport {
+        checkOfferings(offerings, parameterName.name(), all);
     }
 
     protected void checkOffering(final String offering, final Enum<?> parameterName) throws OwsExceptionReport {
-        checkOffering(offering, parameterName.name());
+        checkOffering(offering, parameterName.name(), false);
+    }
+
+    protected void checkOffering(final String offering, final String parameterName, boolean all) throws OwsExceptionReport {
+        if (offering == null || offering.isEmpty()) {
+            throw new MissingParameterValueException(parameterName);
+        }
+        if (all) {
+            if (!getCache().getOfferings().contains(offering)) {
+                throw new InvalidParameterValueException(parameterName, offering);
+            }
+        } else {
+            if (!getCache().getPublishedOfferings().contains(offering)) {
+                throw new InvalidParameterValueException(parameterName, offering);
+            }
+        }
+        
     }
 
     protected void checkSpatialFilters(final List<SpatialFilter> spatialFilters, final String name)
@@ -606,6 +671,19 @@ public abstract class AbstractRequestOperator<D extends OperationDAO, Q extends 
             }
         }
         return Lists.newArrayList(allFeatures);
+    }
+    
+    protected List<String> addChildOfferings(List<String> offerings) {
+        final Set<String> allOffering = Sets.newHashSet();
+        if (offerings != null) {
+            for (final String offering : offerings) {
+                allOffering.add(offering);
+                for (String procedure : getCache().getHiddenChildProceduresForOffering(offering)) {
+                    allOffering.addAll(getCache().getOfferingsForProcedure(procedure));
+                }
+            }
+        }
+        return Lists.newArrayList(allOffering);
     }
 
     protected void checkObservationType(final String observationType, final String parameterName)

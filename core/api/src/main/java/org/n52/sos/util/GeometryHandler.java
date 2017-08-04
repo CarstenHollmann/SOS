@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -168,9 +168,13 @@ public class GeometryHandler implements Cleanupable, EpsgConstants {
             }
         }
         /*
-         * close {@link WeakCollectionCleaner}
+         * close {@link WeakCollectionCleaner} 
+         * 
+         * Note: Not required if
+         * se.jiderhamn.classloader.leak.prevention.ClassLoaderLeakPreventor is
+         * defined in the web.xml
          */
-        WeakCollectionCleaner.DEFAULT.exit();
+        // WeakCollectionCleaner.DEFAULT.exit();
     }
 
     /**
@@ -512,9 +516,6 @@ public class GeometryHandler implements Cleanupable, EpsgConstants {
      * @return WKT string
      */
     public String getWktString(Object longitude, Object latitude, int epsg) {
-        if (isNorthingFirstEpsgCode(epsg)) {
-            return getWktString(latitude, longitude);
-        }
         return getWktString(longitude, latitude);
     }
 

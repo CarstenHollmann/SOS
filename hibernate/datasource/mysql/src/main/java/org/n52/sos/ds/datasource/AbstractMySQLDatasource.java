@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -73,6 +73,16 @@ public abstract class AbstractMySQLDatasource extends AbstractHibernateFullDBDat
 
     AbstractMySQLDatasource(boolean supportsSchema) {
         super(supportsSchema);
+        setUsernameDefault(USERNAME_DEFAULT_VALUE);
+        setUsernameDescription(USERNAME_DESCRIPTION);
+        setPasswordDefault(PASSWORD_DEFAULT_VALUE);
+        setPasswordDescription(PASSWORD_DESCRIPTION);
+        setDatabaseDefault(DATABASE_DEFAULT_VALUE);
+        setDatabaseDescription(DATABASE_DESCRIPTION);
+        setHostDefault(HOST_DEFAULT_VALUE);
+        setHostDescription(HOST_DESCRIPTION);
+        setPortDefault(PORT_DEFAULT_VALUE);
+        setPortDescription(PORT_DESCRIPTION);
     }
 
     @Override
@@ -173,6 +183,7 @@ public abstract class AbstractMySQLDatasource extends AbstractHibernateFullDBDat
                     = (String) settings.get(HibernateConstants.CONNECTION_PASSWORD);
             String user
                     = (String) settings.get(HibernateConstants.CONNECTION_USERNAME);
+            precheckDriver(jdbc, user, pass);
             return DriverManager.getConnection(jdbc, user, pass);
         } catch (ClassNotFoundException ex) {
             throw new SQLException(ex);
@@ -184,4 +195,20 @@ public abstract class AbstractMySQLDatasource extends AbstractHibernateFullDBDat
                                          Map<String, Object> arg2) {
     }
 
+    @Override
+    protected String[] checkCreateSchema(String[] script) {
+        String[] checkCreateSchema = super.checkCreateSchema(script);
+        for (int i = 0; i < checkCreateSchema.length; i++) {
+            checkCreateSchema[i] = checkForNullableTimestamp(checkCreateSchema[i]);
+        }
+        return checkCreateSchema;
+    }
+
+    private String checkForNullableTimestamp(String string) {
+        if (string.contains("timestamp default NULL")){
+            return string.replaceAll("timestamp default NULL", "timestamp NULL default NULL");
+        }
+        return string;
+    }
+    
 }

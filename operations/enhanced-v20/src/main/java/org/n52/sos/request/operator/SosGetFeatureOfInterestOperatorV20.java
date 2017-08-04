@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -90,7 +90,7 @@ public class SosGetFeatureOfInterestOperatorV20
             exceptions.add(owse);
         }
         try {
-            checkProcedureIDs(sosRequest.getProcedures(), Sos2Constants.GetFeatureOfInterestParams.procedure.name());
+            checkProcedures(sosRequest.getProcedures(), Sos2Constants.GetFeatureOfInterestParams.procedure.name());
             if (sosRequest.isSetProcedures()) {
                 sosRequest.setProcedures(addChildProcedures(sosRequest.getProcedures()));
             }

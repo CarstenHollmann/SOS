@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -28,13 +28,19 @@
  */
 package org.n52.sos.ds.datasource;
 
-public class SqlServerCustomDatasource extends AbstractSqlServerDatasource {
+/**
+ * MS SQL Server datasource for custom mapping
+ * 
+ * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
+ * @since 4.2.0
+ *
+ */
+public class SqlServerCustomDatasource extends SqlServerCoreDatasource {
 
-    private static final String DIALECT_NAME = "SQL Server Custom";
+    private static final String DIALECT_NAME = "SQL Server Custom Core";
 
     public SqlServerCustomDatasource() {
         super();
-        super.setTransactional(false);
     }
 
     @Override

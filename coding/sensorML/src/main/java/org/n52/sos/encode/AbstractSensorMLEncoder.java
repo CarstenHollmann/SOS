@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -495,6 +495,17 @@ public abstract class AbstractSensorMLEncoder extends AbstractXmlEncoder<Object>
             outputName = OUTPUT_PREFIX + (counter + 1);
         }
         return NcNameResolver.fixNcName(outputName);
+    }
+    
+    protected void extendOutputs(AbstractProcess abstractProcess) {
+        if (abstractProcess.isSetPhenomenon()) {
+            for (SmlIo<?> output : abstractProcess.getOutputs()) {
+                if (abstractProcess.hasPhenomenonFor(output.getIoValue().getDefinition())) {
+                    output.getIoValue().setName(
+                            abstractProcess.getPhenomenonFor(output.getIoValue().getDefinition()).getName());
+                }
+            }
+        }
     }
     
     protected XmlOptions getOptions() {

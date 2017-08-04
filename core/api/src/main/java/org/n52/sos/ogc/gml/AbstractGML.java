@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -38,6 +38,7 @@ import org.n52.sos.util.Constants;
 import org.n52.sos.util.StringHelper;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 
 public abstract class AbstractGML implements Serializable{
 
@@ -59,6 +60,8 @@ public abstract class AbstractGML implements Serializable{
      * Feature description
      */
     private String description;
+    
+    private List<AbstractMetaData> metaDataProperty = Lists.newArrayList();
 
     /**
      * GML id
@@ -349,6 +352,40 @@ public abstract class AbstractGML implements Serializable{
     public boolean isSetDescription() {
         return StringHelper.isNotEmpty(getDescription());
     }
+    
+    /**
+     * @return the metaDataProperty
+     */
+    public List<AbstractMetaData> getMetaDataProperty() {
+        return metaDataProperty;
+    }
+
+    /**
+     * @param metaDataProperty the metaDataProperty to set
+     */
+    public void setMetaDataProperty(List<AbstractMetaData> metaDataProperty) {
+        this.metaDataProperty.clear();
+        this.metaDataProperty.addAll(metaDataProperty);
+    }
+    
+    /**
+     * @param metaDataProperty the metaDataProperty to add
+     */
+    public void addMetaDataProperty(List<AbstractMetaData> metaDataProperty) {
+        this.metaDataProperty.addAll(metaDataProperty);
+    }
+    
+    /**
+     * @param metaDataProperty the metaDataProperty to add
+     */
+    public void addMetaDataProperty(AbstractMetaData metaDataProperty) {
+        this.metaDataProperty.add(metaDataProperty);
+    }
+    
+    
+    public boolean isSetMetaDataProperty() {
+        return CollectionHelper.isNotEmpty(getMetaDataProperty());
+    }
 
     /**
      * Get GML id
@@ -393,5 +430,6 @@ public abstract class AbstractGML implements Serializable{
         copyOf.setGmlId(getGmlId());
         copyOf.setIdentifier(getIdentifierCodeWithAuthority());
         copyOf.setName(getName());
+        copyOf.setMetaDataProperty(getMetaDataProperty());
     }
 }

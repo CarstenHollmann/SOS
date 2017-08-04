@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -228,6 +228,15 @@ public class GetDataAvailabilityResponse extends AbstractServiceResponse {
             return CollectionHelper.isNotEmpty(getResultTimes());
         }
         
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof DataAvailability) {
+                return getProcedure().getHref().equals(((DataAvailability) o).getProcedure().getHref())
+                        && getFeatureOfInterest().getHref().equals(((DataAvailability) o).getFeatureOfInterest().getHref())
+                        && getObservedProperty().getHref().equals(((DataAvailability) o).getObservedProperty().getHref());
+            }
+            return false;
+        }
     }
 
     public void setNamespace(String namespace) {

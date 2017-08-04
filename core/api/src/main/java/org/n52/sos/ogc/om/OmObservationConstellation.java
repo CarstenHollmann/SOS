@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -84,6 +84,27 @@ public class OmObservationConstellation implements Serializable, Cloneable {
         super();
         this.procedure = procedure;
         this.observableProperty = observableProperty;
+        this.featureOfInterest = featureOfInterest;
+    }
+    
+    /**
+     * constructor
+     * 
+     * @param procedure
+     *            Procedure by which the observation is made
+     * @param observableProperty
+     *            observableProperty to which the observation accords to
+     * @param featureOfInterest
+     *            featureOfInterest to which this observation belongs
+     * @param offerings
+     *            offering to which this observation belongs
+     */
+    public OmObservationConstellation(SosProcedureDescription procedure, AbstractPhenomenon observableProperty,
+            AbstractFeature featureOfInterest, Set<String> offerings) {
+        super();
+        this.procedure = procedure;
+        this.observableProperty = observableProperty;
+        this.offerings = offerings;
         this.featureOfInterest = featureOfInterest;
     }
 

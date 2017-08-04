@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -88,10 +88,15 @@ public class ResultTemplate implements Serializable, HasIdentifier, HasProcedure
     }
 
     @Override
+    public boolean isSetOffering() {
+        return getOffering() != null;
+    }
+
+    @Override
     public ObservableProperty getObservableProperty() {
         return this.observableProperty;
     }
-
+    
     @Override
     public void setObservableProperty(ObservableProperty observableProperty) {
         this.observableProperty = observableProperty;

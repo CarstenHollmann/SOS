@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -36,6 +36,8 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -51,6 +53,7 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.mapping.Table;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.hibernate.tool.hbm2ddl.SchemaUpdateScript;
+import org.n52.sos.config.SettingDefinition;
 import org.n52.sos.config.SettingDefinitionProvider;
 import org.n52.sos.config.settings.BooleanSettingDefinition;
 import org.n52.sos.config.settings.ChoiceSettingDefinition;
@@ -152,7 +155,7 @@ public abstract class AbstractHibernateDatasource extends AbstractHibernateCoreD
     protected static final String PROVIDED_JDBC_DRIVER_TITLE = "Provided JDBC driver";
 
     protected static final String PROVIDED_JDBC_DRIVER_DESCRIPTION =
-            "Is the JDBC driver provided and should not be derigistered during shutdown?";
+            "Is the JDBC driver provided and should not be deregistered during shutdown?";
 
     protected static final String PROVIDED_JDBC_DRIVER_KEY = "sos.jdbc.provided";
 
@@ -540,7 +543,7 @@ public abstract class AbstractHibernateDatasource extends AbstractHibernateCoreD
         return null;
     }
 
-    private String checkCatalog(Connection conn) throws SQLException {
+    protected String checkCatalog(Connection conn) throws SQLException {
         return conn.getCatalog();
     }
 
@@ -629,6 +632,16 @@ public abstract class AbstractHibernateDatasource extends AbstractHibernateCoreD
         }
         return false;
     }
+    
+    protected Set<SettingDefinition<?,?>> filter(Set<SettingDefinition<?,?>> definitions, Set<String> keysToExclude) {
+        Iterator<SettingDefinition<?, ?>> iterator = definitions.iterator();
+        while(iterator.hasNext()) {
+            if (keysToExclude.contains(iterator.next().getKey())) {
+                iterator.remove();
+            }
+        }
+        return definitions;
+    }
 
     /**
      * Get internal Hibernate dialect
@@ -716,19 +729,24 @@ public abstract class AbstractHibernateDatasource extends AbstractHibernateCoreD
      */
     protected void addMappingFileDirectories(Map<String, Object> settings, Properties p) {
         StringBuilder builder = new StringBuilder();
-        builder.append(HIBERNATE_MAPPING_CORE_PATH);
-        builder.append(SessionFactoryProvider.PATH_SEPERATOR).append(
-                getDatabaseConceptMappingDirectory(settings));
-        if (isTransactionalDatasource()) {
-            Boolean t = (Boolean) settings.get(transactionalDefiniton.getKey());
-            if (t != null && t) {
-                builder.append(SessionFactoryProvider.PATH_SEPERATOR).append(HIBERNATE_MAPPING_TRANSACTIONAL_PATH);
+        if (settings.containsKey(SessionFactoryProvider.HIBERNATE_DIRECTORY)) {
+            // don't re-write setting if present
+            builder.append(settings.get(SessionFactoryProvider.HIBERNATE_DIRECTORY));
+        } else {
+            builder.append(HIBERNATE_MAPPING_CORE_PATH)
+                   .append(SessionFactoryProvider.PATH_SEPERATOR)
+                   .append(getDatabaseConceptMappingDirectory(settings));
+            if (isTransactionalDatasource()) {
+                Boolean t = (Boolean) settings.get(transactionalDefiniton.getKey());
+                if (t != null && t) {
+                    builder.append(SessionFactoryProvider.PATH_SEPERATOR).append(HIBERNATE_MAPPING_TRANSACTIONAL_PATH);
+                }
             }
-        }
-        if (isMultiLanguageDatasource()) {
-            Boolean t = (Boolean) settings.get(multilingualismDefinition.getKey());
-            if (t != null && t) {
-                builder.append(SessionFactoryProvider.PATH_SEPERATOR).append(HIBERNATE_MAPPING_I18N_PATH);
+            if (isMultiLanguageDatasource()) {
+                Boolean t = (Boolean) settings.get(multilingualismDefinition.getKey());
+                if (t != null && t) {
+                    builder.append(SessionFactoryProvider.PATH_SEPERATOR).append(HIBERNATE_MAPPING_I18N_PATH);
+                }
             }
         }
         p.put(SessionFactoryProvider.HIBERNATE_DIRECTORY, builder.toString());
@@ -960,6 +978,34 @@ public abstract class AbstractHibernateDatasource extends AbstractHibernateCoreD
     public String getDatasourceDaoIdentifier() {
         return HibernateDatasourceConstants.ORM_DATASOURCE_DAO_IDENTIFIER;
     }
+    
+	/**
+	 * Workaround for Java {@link DriverManager} issue with more than one registered
+	 * drivers. Only the first {@link SQLException} is catched and thrown
+	 * instead of the {@link SQLException} related to the driver which is valid for
+	 * the URL.
+	 * 
+	 * @param url
+	 *            DB connection URL
+	 * @param user
+	 *            User name
+	 * @param password
+	 *            Password
+	 * @throws SQLException
+	 */
+	protected void precheckDriver(String url, String user, String password) throws SQLException {
+		Driver driver = DriverManager.getDriver(url);
+		if (driver != null) {
+			java.util.Properties info = new java.util.Properties();
+			if (user != null) {
+				info.put("user", user);
+			}
+			if (password != null) {
+				info.put("password", password);
+			}
+			driver.connect(url, info).close();
+		}
+	}
 
     /**
      * Gets the qualified name of the driver class.

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -111,21 +111,19 @@ public class OfferingDAO extends TimeCreator implements HibernateSqlQueryConstan
      * Get offering objects for cache update
      *
      * @param identifiers
-     *            Optional collection of offering identifiers to fetch. If null, all offerings are returned.
+     *            Optional collection of offering identifiers to fetch. If null,
+     *            all offerings are returned.
      * @param session
      *            Hibernate session
      * @return Offering objects
      */
     @SuppressWarnings("unchecked")
-    public List<Offering> getOfferingObjectsForCacheUpdate(final Collection<String> identifiers, final Session session) {
-    	 Class<?> clazz = Offering.class;
-    	 if (HibernateHelper.isEntitySupported(TOffering.class)) {
-    		 clazz = TOffering.class;
-    	 }
-    	 Criteria criteria = session.createCriteria(clazz);
-		if (CollectionHelper.isNotEmpty(identifiers)) {
-		    criteria.add(Restrictions.in(Offering.IDENTIFIER, identifiers));
-		}
+    public List<Offering> getOfferingObjectsForCacheUpdate(final Collection<String> identifiers,
+            final Session session) {
+        Criteria criteria = session.createCriteria(Offering.class);
+        if (CollectionHelper.isNotEmpty(identifiers)) {
+            criteria.add(Restrictions.in(Offering.IDENTIFIER, identifiers));
+        }
         LOGGER.debug("QUERY getOfferingObjectsForCacheUpdate(): {}", HibernateHelper.getSqlString(criteria));
         return criteria.list();
     }
@@ -237,45 +235,6 @@ public class OfferingDAO extends TimeCreator implements HibernateSqlQueryConstan
                 "QUERY getOfferingIdentifiersForObservableProperty(observablePropertyIdentifier) using ObservationContellation entitiy ({}): {}",
                 flag, HibernateHelper.getSqlString(c));
         return c.list();
-    }
-
-    public class OfferingTimeExtrema {
-        private DateTime minPhenomenonTime;
-        private DateTime maxPhenomenonTime;
-        private DateTime minResultTime;
-        private DateTime maxResultTime;
-
-        public DateTime getMinPhenomenonTime() {
-            return minPhenomenonTime;
-        }
-
-        public void setMinPhenomenonTime(DateTime minPhenomenonTime) {
-            this.minPhenomenonTime = minPhenomenonTime;
-        }
-
-        public DateTime getMaxPhenomenonTime() {
-            return maxPhenomenonTime;
-        }
-
-        public void setMaxPhenomenonTime(DateTime maxPhenomenonTime) {
-            this.maxPhenomenonTime = maxPhenomenonTime;
-        }
-
-        public DateTime getMinResultTime() {
-            return minResultTime;
-        }
-
-        public void setMinResultTime(DateTime minResultTime) {
-            this.minResultTime = minResultTime;
-        }
-
-        public DateTime getMaxResultTime() {
-            return maxResultTime;
-        }
-
-        public void setMaxResultTime(DateTime maxResultTime) {
-            this.maxResultTime = maxResultTime;
-        }
     }
 
     /**
@@ -641,10 +600,85 @@ public class OfferingDAO extends TimeCreator implements HibernateSqlQueryConstan
 
     /**
      * Add offering identifier restriction to Hibernate Criteria
-     * @param criteria Hibernate Criteria to add restriction
-     * @param offering Offering identifier
+     * 
+     * @param criteria
+     *            Hibernate Criteria to add restriction
+     * @param offering
+     *            Offering identifier
      */
-    public void addOfferingRestricionForObservation(Criteria criteria, String offering) {
-        criteria.createCriteria(AbstractObservation.OFFERINGS).add(Restrictions.eq(Offering.IDENTIFIER, offering));
+    public void addOfferingRestricionForObservation(Criteria c, String offering) {
+        addOfferingRestrictionFor(c, offering, AbstractObservation.OFFERINGS);
+    }
+
+    /**
+     * Add offering identifier restriction to Hibernate Criteria
+     * 
+     * @param criteria
+     *            Hibernate Criteria to add restriction
+     * @param offering
+     *            Offering identifier
+     */
+    public void addOfferingRestricionForSeries(Criteria c, String offering) {
+        addOfferingRestrictionFor(c, offering, Series.OFFERING);
+    }
+
+    private void addOfferingRestrictionFor(Criteria c, String offering, String associationPath) {
+        c.createCriteria(associationPath).add(Restrictions.eq(Offering.IDENTIFIER, offering));
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Offering> getPublishedOffering(Collection<String> identifiers, Session session) throws CodedException {
+        if (HibernateHelper.isEntitySupported(Series.class)) {
+            Criteria c = session.createCriteria(Offering.class).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+            c.add(Subqueries.propertyIn(Offering.ID, getDetachedCriteriaSeries(session)));
+            return c.list();
+        } 
+        return getOfferingObjectsForCacheUpdate(identifiers, session);
+     }
+
+    private DetachedCriteria getDetachedCriteriaSeries(Session session) throws CodedException {
+         final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(DaoFactory.getInstance().getSeriesDAO().getSeriesClass());
+         detachedCriteria.add(Restrictions.eq(Series.DELETED, false)).add(Restrictions.eq(Series.PUBLISHED, true));
+         detachedCriteria.setProjection(Projections.distinct(Projections.property(Series.OFFERING)));
+         return detachedCriteria;
+     }
+
+    public class OfferingTimeExtrema {
+        private DateTime minPhenomenonTime;
+        private DateTime maxPhenomenonTime;
+        private DateTime minResultTime;
+        private DateTime maxResultTime;
+    
+        public DateTime getMinPhenomenonTime() {
+            return minPhenomenonTime;
+        }
+    
+        public void setMinPhenomenonTime(DateTime minPhenomenonTime) {
+            this.minPhenomenonTime = minPhenomenonTime;
+        }
+    
+        public DateTime getMaxPhenomenonTime() {
+            return maxPhenomenonTime;
+        }
+    
+        public void setMaxPhenomenonTime(DateTime maxPhenomenonTime) {
+            this.maxPhenomenonTime = maxPhenomenonTime;
+        }
+    
+        public DateTime getMinResultTime() {
+            return minResultTime;
+        }
+    
+        public void setMinResultTime(DateTime minResultTime) {
+            this.minResultTime = minResultTime;
+        }
+    
+        public DateTime getMaxResultTime() {
+            return maxResultTime;
+        }
+    
+        public void setMaxResultTime(DateTime maxResultTime) {
+            this.maxResultTime = maxResultTime;
+        }
     }
 }

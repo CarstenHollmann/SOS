@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -31,11 +31,9 @@ package org.n52.sos.ds.hibernate.util.observation;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.n52.sos.convert.ConverterException;
 import org.n52.sos.ds.hibernate.entities.series.Series;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
 import org.n52.sos.ogc.gml.AbstractFeature;
 import org.n52.sos.ogc.gml.time.TimeInstant;
 import org.n52.sos.ogc.om.OmObservableProperty;
@@ -61,10 +59,6 @@ import com.google.common.collect.Sets;
 public class SeriesOmObservationCreator extends AbstractOmObservationCreator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SeriesOmObservationCreator.class);
-
-    private static final String SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES = "getUnitForObservablePropertyProcedureSeries";
-
-    private static final String SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES = "getUnitForObservablePropertySeries";
 
     protected final Series series;
 
@@ -95,7 +89,7 @@ public class SeriesOmObservationCreator extends AbstractOmObservationCreator {
         if (series != null) {
             SosProcedureDescription procedure = createProcedure(series.getProcedure().getIdentifier());
             OmObservableProperty obsProp = createObservableProperty(series.getObservableProperty());
-            obsProp.setUnit(queryUnit());
+            obsProp.setUnit(queryUnit(getSeries()));
             AbstractFeature feature = createFeatureOfInterest(series.getFeatureOfInterest().getIdentifier());
 
             final OmObservationConstellation obsConst = getObservationConstellation(procedure, obsProp, feature);
@@ -190,26 +184,4 @@ public class SeriesOmObservationCreator extends AbstractOmObservationCreator {
             creator.create(sosObservation, series);
         }
     }
-
-    private String queryUnit() {
-        if (HibernateHelper.isNamedQuerySupported(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES, getSession())) {
-            Query namedQuery = getSession().getNamedQuery(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES);
-            namedQuery.setParameter(Series.OBSERVABLE_PROPERTY,
-                    series.getObservableProperty().getIdentifier());
-            namedQuery.setParameter(Series.PROCEDURE,
-                    series.getProcedure().getIdentifier());
-            LOGGER.debug("QUERY queryUnit(observationConstellation) with NamedQuery: {}",
-                    SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES);
-            return (String) namedQuery.uniqueResult();
-        } else if (HibernateHelper.isNamedQuerySupported(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES, getSession())) {
-            Query namedQuery = getSession().getNamedQuery(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES);
-            namedQuery.setParameter(Series.OBSERVABLE_PROPERTY,
-                    series.getObservableProperty().getIdentifier());
-            LOGGER.debug("QUERY queryUnit(observationConstellation) with NamedQuery: {}",
-                    SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES);
-            return (String) namedQuery.uniqueResult();
-        }
-        return null;
-    }
-
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -451,6 +451,10 @@ public class OmDecoderv20 implements Decoder<Object, Object> {
             } else if (decodedObject instanceof Geometry) {
                 SingleObservationValue<Geometry> result = new SingleObservationValue<Geometry>();
                 result.setValue(new GeometryValue((Geometry) decodedObject));
+                return result;
+            } else if (decodedObject instanceof AbstractGeometry) {
+                SingleObservationValue<Geometry> result = new SingleObservationValue<Geometry>();
+                result.setValue(new GeometryValue(((AbstractGeometry) decodedObject).getGeometry()));
                 return result;
             } else if (decodedObject instanceof SweDataArray) {
                 SweDataArrayValue value = new SweDataArrayValue();

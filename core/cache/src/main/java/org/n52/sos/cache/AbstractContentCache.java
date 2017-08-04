@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -336,6 +336,22 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
         }
     }
 
+    /**
+     * @return the updateTime
+     */
+    public DateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    /**
+     * @param updateTime the updateTime to set
+     */
+    public void setUpdateTime(DateTime updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    private DateTime updateTime;
+    
     private int defaultEpsgCode = Constants.EPSG_WGS84;
 
     private Map<String, DateTime> maxPhenomenonTimeForOfferings = newSynchronizedMap();
@@ -444,6 +460,11 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     private BiMap<String, String> offeringIdentifierHumanReadableName = newSynchronizedBiMap();
     
 //    private Map<String, String> offeringHumanReadableNameForIdentifier = newSynchronizedMap();
+    
+    private Set<String> publishedFeatureOfInterest = newSynchronizedSet();
+    private Set<String> publishedProcedure= newSynchronizedSet();
+    private Set<String> publishedOffering = newSynchronizedSet();
+    private Set<String> publishedObservableProperty = newSynchronizedSet();
     
     /**
      * @return the relating offering -> max phenomenon time
@@ -797,6 +818,22 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     	return offeringIdentifierHumanReadableName.inverse();
     }
 
+    protected Set<String> getPublishedFeatureOfInterestSet() {
+        return publishedFeatureOfInterest;
+    }
+    
+    protected Set<String> getPublishedProcedureSet() {
+        return publishedProcedure;
+    }
+    
+    protected Set<String> getPublishedOfferingSet() {
+        return publishedOffering;
+    }
+    
+    protected Set<String> getPublishedObservablePropertySet() {
+        return publishedObservableProperty;
+    }
+
     /**
      * @param defaultEpsgCode
      *            the new default EPSG code
@@ -809,11 +846,10 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
     public int getDefaultEPSGCode() {
         return this.defaultEpsgCode;
     }
-
-
+    
     @Override
     public int hashCode() {
-        return Objects.hashCode(defaultEpsgCode, maxPhenomenonTimeForOfferings, minPhenomenonTimeForOfferings,
+        return Objects.hashCode(updateTime,defaultEpsgCode, maxPhenomenonTimeForOfferings, minPhenomenonTimeForOfferings,
                 maxResultTimeForOfferings, minResultTimeForOfferings, maxPhenomenonTimeForProcedures,
                 minPhenomenonTimeForProcedures, allowedObservationTypeForOfferings, childFeaturesForFeatureOfInterest,
                 childProceduresForProcedures, compositePhenomenonForOfferings, featuresOfInterestForOfferings,
@@ -827,14 +863,16 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
                 procedures, resultTemplates, offerings, globalEnvelope, globalResultTimeEnvelope,
                 globalPhenomenonTimeEnvelope, supportedLanguages, requestableProcedureDescriptionFormats,
                 featureOfInterestIdentifierHumanReadableName, observablePropertyIdentifierHumanReadableName,
-				procedureIdentifierHumanReadableName, offeringIdentifierHumanReadableName);
+		procedureIdentifierHumanReadableName, offeringIdentifierHumanReadableName, publishedFeatureOfInterest,
+		publishedObservableProperty, publishedOffering, publishedProcedure);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof AbstractContentCache) {
             final AbstractContentCache other = (AbstractContentCache) obj;
-            return Objects.equal(this.defaultEpsgCode, other.getDefaultEPSGCode())
+            return Objects.equal(this.updateTime, other.getUpdateTime())
+                    && Objects.equal(this.defaultEpsgCode, other.getDefaultEPSGCode())
                     && Objects.equal(this.maxPhenomenonTimeForOfferings, other.getMaxPhenomenonTimeForOfferingsMap())
                     && Objects.equal(this.minPhenomenonTimeForOfferings, other.getMinPhenomenonTimeForOfferingsMap())
                     && Objects.equal(this.maxResultTimeForOfferings, other.getMaxResultTimeForOfferingsMap())
@@ -894,7 +932,11 @@ public abstract class AbstractContentCache extends AbstractStaticContentCache {
                     && Objects.equal(this.getFeatureOfInterestIdentifierForHumanReadableName(), other.getFeatureOfInterestIdentifierForHumanReadableName())
                     && Objects.equal(this.getObservablePropertyIdentifierForHumanReadableName(), other.getObservablePropertyIdentifierForHumanReadableName())
                     && Objects.equal(this.getProcedureIdentifierForHumanReadableName(), other.getProcedureIdentifierForHumanReadableName())
-                    && Objects.equal(this.getOfferingIdentifierForHumanReadableName(), other.getOfferingIdentifierForHumanReadableName());
+                    && Objects.equal(this.getOfferingIdentifierForHumanReadableName(), other.getOfferingIdentifierForHumanReadableName())
+                    && Objects.equal(this.getPublishedFeatureOfInterest(), other.getPublishedFeatureOfInterest())
+                    && Objects.equal(this.getPublishedObservableProperties(), other.getPublishedObservableProperties())
+                    && Objects.equal(this.getPublishedOfferings(), other.getPublishedOfferings())
+                    && Objects.equal(this.getPublishedProcedures(), other.getPublishedProcedures());
         }
         return false;
     }

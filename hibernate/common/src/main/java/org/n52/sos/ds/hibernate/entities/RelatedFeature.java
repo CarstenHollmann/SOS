@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -100,17 +100,9 @@ public class RelatedFeature implements Serializable, HasFeatureOfInterest, HasRe
         }
     }
     
-//    @Override
-//    public Offering getOffering() {
-//        return this.offering;
-//    }
-//    
-//    @Override
-//    public void setOfferings(final Offering offering) {
-//        if (getOfferings() == null)  {
-//            setOfferings( new HashSet<Offering>(0));
-//        }
-//        getOfferings().add(offering);
-//        this.offering = offering;
-//    }
+    @Override
+    public boolean isSetOfferings() {
+        return getOfferings() != null && !getOfferings().isEmpty();
+    }
+    
 }

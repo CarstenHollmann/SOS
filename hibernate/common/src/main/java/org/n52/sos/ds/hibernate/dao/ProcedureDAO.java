@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -113,7 +113,7 @@ public class ProcedureDAO extends AbstractIdentifierNameDescriptionDAO implement
      */
     @SuppressWarnings("unchecked")
     public List<Procedure> getProcedureObjects(final Session session) {
-        Criteria criteria = session.createCriteria(Procedure.class);
+        Criteria criteria = getDefaultCriteria(session);
         LOGGER.debug("QUERY getProcedureObjects(): {}", HibernateHelper.getSqlString(criteria));
         return criteria.list();
     }
@@ -126,8 +126,7 @@ public class ProcedureDAO extends AbstractIdentifierNameDescriptionDAO implement
      */
     public Map<String,Collection<String>> getProcedureIdentifiers(final Session session) {
         boolean tProcedureSupported = HibernateHelper.isEntitySupported(TProcedure.class);
-        Criteria criteria = session.createCriteria(Procedure.class)
-                .add(Restrictions.eq(Procedure.DELETED, false));
+        Criteria criteria = getDefaultCriteria(session);
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property(Procedure.IDENTIFIER));
         if (tProcedureSupported) {
@@ -606,8 +605,8 @@ public class ProcedureDAO extends AbstractIdentifierNameDescriptionDAO implement
         if (isProcedureTimeExtremaNamedQuerySupported(session)) {
             Query namedQuery = session.getNamedQuery(SQL_QUERY_GET_PROCEDURE_TIME_EXTREMA);
             namedQuery.setParameter(PROCEDURE, procedureIdentifier);
-            LOGGER.debug("QUERY getProcedureTimeExtrema(procedure) with NamedQuery: {}",
-                    SQL_QUERY_GET_PROCEDURE_TIME_EXTREMA);
+            LOGGER.debug("QUERY getProcedureTimeExtrema({}) with NamedQuery '{}': {}", procedureIdentifier,
+                    SQL_QUERY_GET_PROCEDURE_TIME_EXTREMA, namedQuery.getQueryString());
             result = (Object[]) namedQuery.uniqueResult();
         }
         return parseProcedureTimeExtremaResult(result);
@@ -930,7 +929,7 @@ public class ProcedureDAO extends AbstractIdentifierNameDescriptionDAO implement
             //get the latest validProcedureTimes' procedureDescriptionFormats
             return new ValidProcedureTimeDAO().getTProcedureFormatMap(session);
         } else {
-            Criteria criteria = session.createCriteria(Procedure.class);
+            Criteria criteria = getDefaultCriteria(session);
             criteria.createAlias(Procedure.PROCEDURE_DESCRIPTION_FORMAT, "pdf");
             criteria.setProjection(Projections.projectionList()
                     .add(Projections.property(Procedure.IDENTIFIER))
@@ -948,4 +947,21 @@ public class ProcedureDAO extends AbstractIdentifierNameDescriptionDAO implement
             return procedureFormatMap;
         }
     }
+
+    @SuppressWarnings("unchecked")
+    public List<Procedure> getPublishedProcedure(Session session) throws CodedException {
+        if (HibernateHelper.isEntitySupported(Series.class)) {
+            Criteria c = session.createCriteria(Procedure.class).setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+            c.add(Subqueries.propertyIn(Procedure.ID, getDetachedCriteriaSeries(session)));
+            return c.list();
+        } 
+        return getProcedureObjects(session);
+     }
+     
+     private DetachedCriteria getDetachedCriteriaSeries(Session session) throws CodedException {
+         final DetachedCriteria detachedCriteria = DetachedCriteria.forClass(DaoFactory.getInstance().getSeriesDAO().getSeriesClass());
+         detachedCriteria.add(Restrictions.eq(Series.DELETED, false)).add(Restrictions.eq(Series.PUBLISHED, true));
+         detachedCriteria.setProjection(Projections.distinct(Projections.property(Series.PROCEDURE)));
+         return detachedCriteria;
+     }
 }

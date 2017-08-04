@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -51,6 +51,11 @@ import org.n52.sos.util.CollectionHelper;
  */
 public class ReadableCache extends AbstractContentCache {
     private static final long serialVersionUID = -2197601373007656256L;
+    
+    @Override
+    public DateTime getLastUpdateTime() {
+        return getUpdateTime();
+    }
 
     @Override
     public DateTime getMaxPhenomenonTime() {
@@ -597,5 +602,25 @@ public class ReadableCache extends AbstractContentCache {
     		return getOfferingHumanReadableNameForIdentifier().get(identifier);
     	}
     	return identifier;
+    }
+
+    @Override
+    public Set<String> getPublishedFeatureOfInterest() {
+        return copyOf(getPublishedFeatureOfInterestSet());
+    }
+    
+    @Override
+    public Set<String> getPublishedProcedures() {
+        return copyOf(getPublishedProcedureSet());
+    }
+    
+    @Override
+    public Set<String> getPublishedOfferings() {
+        return copyOf(getPublishedOfferingSet());
+    }
+    
+    @Override
+    public Set<String> getPublishedObservableProperties() {
+        return copyOf(getPublishedObservablePropertySet());
     }
 }

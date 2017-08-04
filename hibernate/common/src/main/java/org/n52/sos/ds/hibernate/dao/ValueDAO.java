@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -145,7 +145,7 @@ public class ValueDAO extends AbstractValueDAO {
         Criteria c =
                 getValueCriteriaFor(request, procedure, observableProperty, featureOfInterest,
                         temporalFilterCriterion, session);
-        addChunkValuesToCriteria(c, chunkSize, currentRow);
+        addChunkValuesToCriteria(c, chunkSize, currentRow, request);
         LOGGER.debug("QUERY getStreamingValuesFor(): {}", HibernateHelper.getSqlString(c));
         return (List<AbstractValue>) c.list();
     }
@@ -176,7 +176,7 @@ public class ValueDAO extends AbstractValueDAO {
             long observableProperty, long featureOfInterest, int chunkSize, int currentRow, Session session)
             throws OwsExceptionReport {
         Criteria c = getValueCriteriaFor(request, procedure, observableProperty, featureOfInterest, null, session);
-        addChunkValuesToCriteria(c, chunkSize, currentRow);
+        addChunkValuesToCriteria(c, chunkSize, currentRow, request);
         LOGGER.debug("QUERY getStreamingValuesFor(): {}", HibernateHelper.getSqlString(c));
         return (List<AbstractValue>) c.list();
     }

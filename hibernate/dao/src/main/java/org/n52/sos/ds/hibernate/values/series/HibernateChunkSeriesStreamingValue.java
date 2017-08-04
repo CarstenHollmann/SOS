@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -71,10 +71,11 @@ public class HibernateChunkSeriesStreamingValue extends HibernateSeriesStreaming
      *            {@link GetObservationRequest}
      * @param series
      *            Datasource series id
+     * @param duplicated 
      * @throws CodedException
      */
-    public HibernateChunkSeriesStreamingValue(GetObservationRequest request, long series) throws CodedException {
-        super(request, series);
+    public HibernateChunkSeriesStreamingValue(GetObservationRequest request, long series, boolean duplicated) throws CodedException {
+        super(request, series, duplicated);
         this.chunkSize = HibernateStreamingConfiguration.getInstance().getChunkSize();
     }
 
@@ -109,8 +110,11 @@ public class HibernateChunkSeriesStreamingValue extends HibernateSeriesStreaming
     public TimeValuePair nextValue() throws OwsExceptionReport {
         try {
             if (hasNextValue()) {
-                AbstractValue resultObject = seriesValuesResult.next();
-                TimeValuePair value = resultObject.createTimeValuePairFrom();
+                AbstractValue resultObject = nextEntity();
+                TimeValuePair value = null;
+                if (checkValue(resultObject)) {
+                    value = resultObject.createTimeValuePairFrom();
+                }
                 session.evict(resultObject);
                 return value;
             }
@@ -126,10 +130,13 @@ public class HibernateChunkSeriesStreamingValue extends HibernateSeriesStreaming
     public OmObservation nextSingleObservation() throws OwsExceptionReport {
         try {
             if (hasNextValue()) {
-                OmObservation observation = observationTemplate.cloneTemplate();
-                AbstractValue resultObject = seriesValuesResult.next();
-                resultObject.addValuesToObservation(observation, getResponseFormat());
-                checkForModifications(observation);
+                OmObservation observation = null;
+                AbstractValue resultObject = nextEntity();
+                if (checkValue(resultObject)) {
+                    observation = observationTemplate.cloneTemplate();
+                    resultObject.addValuesToObservation(observation, getResponseFormat());
+                    checkForModifications(observation);
+                }
                 session.evict(resultObject);
                 return observation;
             }

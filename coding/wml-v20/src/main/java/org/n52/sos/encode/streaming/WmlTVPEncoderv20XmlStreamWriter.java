@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -37,6 +37,7 @@ import org.n52.sos.encode.EncodingValues;
 import org.n52.sos.ogc.gml.GmlConstants;
 import org.n52.sos.ogc.om.MultiObservationValues;
 import org.n52.sos.ogc.om.OmConstants;
+import org.n52.sos.ogc.om.OmObservableProperty;
 import org.n52.sos.ogc.om.OmObservation;
 import org.n52.sos.ogc.om.SingleObservationValue;
 import org.n52.sos.ogc.om.StreamingValue;
@@ -110,12 +111,21 @@ public class WmlTVPEncoderv20XmlStreamWriter extends AbstractOmV20XmlStreamWrite
             close();
         } else if (observation.getValue() instanceof StreamingValue) {
             StreamingValue observationValue = (StreamingValue) observation.getValue();
-            writeDefaultPointMetadata(observationValue.getUnit());
+            if (observationValue.isSetUnit()) {
+                writeDefaultPointMetadata(observationValue.getUnit());
+            } else if (observation.getObservationConstellation().getObservableProperty() instanceof OmObservableProperty
+                && ((OmObservableProperty) observation.getObservationConstellation().getObservableProperty())
+                        .isSetUnit()) {
+                writeDefaultPointMetadata(((OmObservableProperty) observation.getObservationConstellation().getObservableProperty())
+                        .getUnit());
+            }
             writeNewLine();
             while (observationValue.hasNextValue()) {
                 TimeValuePair timeValuePair = observationValue.nextValue();
-                writePoint(getTimeString(timeValuePair.getTime()), getValue(timeValuePair.getValue()));
-                writeNewLine();
+                if (timeValuePair != null) {
+                    writePoint(getTimeString(timeValuePair.getTime()), getValue(timeValuePair.getValue()));
+                    writeNewLine();
+                }
             }
             close();
         } else {
@@ -148,13 +158,13 @@ public class WmlTVPEncoderv20XmlStreamWriter extends AbstractOmV20XmlStreamWrite
     private void writeMeasurementTimeseriesMetadata(String id) throws XMLStreamException {
         start(WaterMLConstants.QN_METADATA);
         writeNewLine();
-        start(WaterMLConstants.QN_TIMESERIES_METADATA);
+        start(WaterMLConstants.QN_MEASUREMENT_TIMESERIES_METADATA);
         writeNewLine();
         empty(WaterMLConstants.QN_TEMPORAL_EXTENT);
         addXlinkHrefAttr("#" + id);
         writeNewLine();
         indent--;
-        end(WaterMLConstants.QN_TIMESERIES_METADATA);
+        end(WaterMLConstants.QN_MEASUREMENT_TIMESERIES_METADATA);
         writeNewLine();
         end(WaterMLConstants.QN_METADATA);
         indent++;

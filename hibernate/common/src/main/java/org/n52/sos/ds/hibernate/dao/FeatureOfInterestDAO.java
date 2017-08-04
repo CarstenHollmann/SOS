@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -38,15 +38,15 @@ import java.util.Map;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.n52.sos.ds.hibernate.dao.series.SeriesObservationDAO;
 import org.n52.sos.ds.hibernate.entities.AbstractObservation;
+import org.n52.sos.ds.hibernate.entities.EntitiyHelper;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
@@ -67,6 +67,8 @@ import org.n52.sos.ogc.ows.OwsExceptionReport;
 import org.n52.sos.service.Configurator;
 import org.n52.sos.util.CollectionHelper;
 import org.n52.sos.util.http.HTTPStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 
@@ -173,22 +175,41 @@ public class FeatureOfInterestDAO extends AbstractIdentifierNameDescriptionDAO i
                     SQL_QUERY_GET_FEATURE_OF_INTEREST_IDENTIFIER_FOR_OFFERING);
             return namedQuery.list();
         } else {
-            AbstractObservationDAO observationDAO = DaoFactory.getInstance().getObservationDAO();
-            Criteria c = observationDAO.getDefaultObservationInfoCriteria(session);
-            if (observationDAO instanceof SeriesObservationDAO) {
-                Criteria seriesCriteria = c.createCriteria(SeriesObservationInfo.SERIES);
-                seriesCriteria.createCriteria(Series.FEATURE_OF_INTEREST).setProjection(
-                        Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
-
+            Criteria c = null;
+            if (EntitiyHelper.getInstance().isSeriesSupported()) {
+                c = session.createCriteria(FeatureOfInterest.class)
+                        .setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
+                c.add(Subqueries.propertyIn(FeatureOfInterest.ID,
+                        getDetachedCriteriaSeriesForOffering(offeringIdentifiers, session)));
+                List list = c.list();
+                if (list == null || (list != null && list.isEmpty())) {
+                    c = DaoFactory.getInstance().getObservationDAO().getDefaultObservationInfoCriteria(session);
+                    Criteria seriesCriteria = c.createCriteria(SeriesObservationInfo.SERIES);
+                    seriesCriteria.createCriteria(Series.FEATURE_OF_INTEREST)
+                            .setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
+                    new OfferingDAO().addOfferingRestricionForObservation(c, offeringIdentifiers);
+                    LOGGER.debug("QUERY getFeatureOfInterestIdentifiersForOffering(offeringIdentifiers): {}",
+                            HibernateHelper.getSqlString(c));
+                }
+                LOGGER.debug("QUERY getFeatureOfInterestIdentifiersForOffering(offeringIdentifiers): {}",
+                        HibernateHelper.getSqlString(c));
+                return list;
             } else {
-                c.createCriteria(AbstractObservation.FEATURE_OF_INTEREST).setProjection(
-                        Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
+                c = DaoFactory.getInstance().getObservationDAO().getDefaultObservationInfoCriteria(session);
+                c.createCriteria(AbstractObservation.FEATURE_OF_INTEREST)
+                        .setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
+                new OfferingDAO().addOfferingRestricionForObservation(c, offeringIdentifiers);
             }
-            new OfferingDAO().addOfferingRestricionForObservation(c, offeringIdentifiers);
             LOGGER.debug("QUERY getFeatureOfInterestIdentifiersForOffering(offeringIdentifiers): {}",
                     HibernateHelper.getSqlString(c));
             return c.list();
         }
+    }
+
+    private DetachedCriteria getDetachedCriteriaSeriesForOffering(String offering, Session session) throws CodedException {
+        final DetachedCriteria detachedCriteria = getDetachedCriteriaSeries(session);
+        detachedCriteria.createCriteria(Series.OFFERING).add(Restrictions.eq(Offering.IDENTIFIER, offering));
+        return detachedCriteria;
     }
 
     /**
@@ -222,9 +243,13 @@ public class FeatureOfInterestDAO extends AbstractIdentifierNameDescriptionDAO i
      */
     @SuppressWarnings("unchecked")
     public List<FeatureOfInterest> getFeatureOfInterestObjects(final Session session) {
-        Criteria criteria = session.createCriteria(FeatureOfInterest.class);
+        Criteria criteria = getDefaultCriteria(session);
         LOGGER.debug("QUERY getFeatureOfInterestObjects(identifier): {}", HibernateHelper.getSqlString(criteria));
         return criteria.list();
+    }
+    
+    private Criteria getDefaultCriteria(final Session session) {
+        return session.createCriteria(FeatureOfInterest.class);
     }
 
     /**
@@ -350,8 +375,10 @@ public class FeatureOfInterestDAO extends AbstractIdentifierNameDescriptionDAO i
                 new RelatedFeatureDAO().getRelatedFeatureForOffering(offering.getIdentifier(), session);
         if (CollectionHelper.isNotEmpty(relatedFeatures)) {
             for (final RelatedFeature relatedFeature : relatedFeatures) {
-                insertFeatureOfInterestRelationShip((TFeatureOfInterest) relatedFeature.getFeatureOfInterest(),
-                        featureOfInterest, session);
+            	if (!featureOfInterest.getIdentifier().equals(relatedFeature.getFeatureOfInterest().getIdentifier())) {
+	                insertFeatureOfInterestRelationShip((TFeatureOfInterest) relatedFeature.getFeatureOfInterest(),
+	                        featureOfInterest, session);
+            	}
             }
         }
     }
@@ -381,5 +408,37 @@ public class FeatureOfInterestDAO extends AbstractIdentifierNameDescriptionDAO i
                     featureOfInterest != null ? featureOfInterest.getClass().getName() : featureOfInterest).setStatus(
                     BAD_REQUEST);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<FeatureOfInterest> getPublishedFeatureOfInterest(Session session) throws CodedException {
+        Criteria c = getPublishedFeatureOfInterestCriteria(session);
+        LOGGER.debug("QUERY getPublishedFeatureOfInterest(): {}", HibernateHelper.getSqlString(c));
+        return c.list();
+    }
+
+    public Criteria getPublishedFeatureOfInterestCriteria(Session session) throws CodedException {
+        Criteria c = getDefaultCriteria(session);
+        if (HibernateHelper.isEntitySupported(Series.class)) {
+            c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+            c.add(Subqueries.propertyIn(FeatureOfInterest.ID, getDetachedCriteriaSeries(session)));
+        }
+        return c;
+    }
+
+    private DetachedCriteria getDetachedCriteriaSeries(Session session) throws CodedException {
+        final DetachedCriteria detachedCriteria =
+                DetachedCriteria.forClass(DaoFactory.getInstance().getSeriesDAO().getSeriesClass());
+        detachedCriteria.add(Restrictions.eq(Series.DELETED, false)).add(Restrictions.eq(Series.PUBLISHED, true));
+        detachedCriteria.setProjection(Projections.distinct(Projections.property(Series.FEATURE_OF_INTEREST)));
+        return detachedCriteria;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> getPublishedFeatureOfInterestIdentifiers(Session session) throws CodedException {
+        Criteria c = getPublishedFeatureOfInterestCriteria(session);
+        c.setProjection(Projections.distinct(Projections.property(FeatureOfInterest.IDENTIFIER)));
+        LOGGER.debug("QUERY getPublishedFeatureOfInterestIdentifiers(): {}", HibernateHelper.getSqlString(c));
+        return c.list();
     }
 }

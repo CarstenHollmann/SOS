@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2015 52°North Initiative for Geospatial Open Source
+ * Copyright (C) 2012-2017 52°North Initiative for Geospatial Open Source
  * Software GmbH
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -106,6 +106,8 @@ public interface WaterMLConstants {
     
     String EN_TIMESERIES_METADATA = "TimeseriesMetadata";
     
+    String EN_MEASUREMENT_TIMESERIES_METADATA = "MeasurementTimeseriesMetadata";
+    
     String EN_TEMPORAL_EXTENT = "temporalExtent";
     
     String EN_DEFAULT_POINT_METADATA = "defaultPointMetadata";
@@ -133,6 +135,8 @@ public interface WaterMLConstants {
     QName QN_MEASUREMENT_TIMESERIES = new QName(NS_WML_20, EN_MEASUREMENT_TIMESERIES, NS_WML_20_PREFIX);
 
     QName QN_TIMESERIES_METADATA = new QName(NS_WML_20, EN_TIMESERIES_METADATA, NS_WML_20_PREFIX);
+    
+    QName QN_MEASUREMENT_TIMESERIES_METADATA = new QName(NS_WML_20, EN_MEASUREMENT_TIMESERIES_METADATA, NS_WML_20_PREFIX);
 
     QName QN_TEMPORAL_EXTENT = new QName(NS_WML_20, EN_TEMPORAL_EXTENT, NS_WML_20_PREFIX);
 
