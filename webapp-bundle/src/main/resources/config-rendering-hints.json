@@ -1,6 +1,6 @@
 {
     "phenomenonStyles": {
-        "6": {
+        "60000": {
             "style": {
                 "chartType": "bar",
                 "properties": {
@@ -12,7 +12,7 @@
         }
     },
     "timeseriesStyles": {
-        "1": {
+        "10000": {
             "style": {
                 "chartType": "bar",
                 "properties": {

@@ -8,7 +8,7 @@
     },
     "phenomenonStyles": [
         {
-            "id" : "3",
+            "id" : "30000",
             "title" : "Title of a Timeseries (without legend)",
             "chartQualifier" : "without_legend",
             "interval": [
@@ -25,7 +25,7 @@
             }
         },
         {
-            "id" : "3",
+            "id" : "30000",
             "title" : "Title of a Timeseries (with legend)",
             "chartQualifier" : "with_legend",
             "interval": [
@@ -45,7 +45,7 @@
             }
         },
         {
-            "id" : "9",
+            "id" : "90000",
             "interval": [
                 "lastWeek",
                 "lastMonth"
@@ -60,7 +60,7 @@
             }
         },
         {
-            "id" : "4",
+            "id" : "40000",
             "interval": [
                 "lastWeek",
                 "lastMonth"
@@ -77,7 +77,7 @@
     ],
     "timeseriesStyles": [
         {
-            "id" : "16",
+            "id" : "160000",
             "interval": [
                 "lastWeek",
                 "lastMonth"

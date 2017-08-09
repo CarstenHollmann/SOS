@@ -1,6 +1,6 @@
 {
     "phenomenonIntervals": {
-        "1": {
+        "10000": {
             "statusIntervals": {
             	"90 - 100 Percent": {
             		"upper" : 100.0,
@@ -54,7 +54,7 @@
              	}
             }
         },
-        "phe_1965ee24af8af96270002b4a434a4250": {
+        "phe_0000": {
             "statusIntervals": {
             	"over 20": {
             		"lower" : 20.0,
@@ -84,7 +84,7 @@
         }
     },
     "timeseriesIntervals": {
-        "ts_123": {
+        "ts_1230000": {
         }
     }
 }
