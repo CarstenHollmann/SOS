@@ -73,6 +73,7 @@ import org.n52.series.db.HibernateSessionStore;
 import org.n52.series.db.beans.OfferingEntity;
 import org.n52.series.db.beans.PhenomenonEntity;
 import org.n52.series.db.beans.ProcedureEntity;
+import org.n52.series.db.beans.TypeEntity;
 import org.n52.series.db.dao.DbQuery;
 import org.n52.series.db.dao.OfferingDao;
 import org.n52.series.db.dao.PhenomenonDao;
@@ -456,8 +457,8 @@ public class GetCapabilitiesHandler extends AbstractGetCapabilitiesHandler {
 
                     // only if fois are contained for the offering set the values of
                     // the envelope
-                    if (offering.hasEnvelope()) {
-                        sosObservationOffering.setObservedArea(processObservedArea(offering.getEnvelope()));
+                    if (offering.getGeometry() != null) {
+                        sosObservationOffering.setObservedArea(processObservedArea(offering.getGeometry().getEnvelope()));
                     } else if (getCache().hasEnvelopeForOffering(offering.getDomainId())) {
                         sosObservationOffering.setObservedArea(getCache().getEnvelopeForOffering(offering.getDomainId()));
                     }
@@ -570,7 +571,7 @@ public class GetCapabilitiesHandler extends AbstractGetCapabilitiesHandler {
                 for (final OfferingEntity offering : offerings) {
                     final Collection<ProcedureEntity> procedures = getProceduresForOffering(offering, session);
                     if (!procedures.isEmpty()) {
-                        final Collection<String> observationTypes = offering.getObservationTypes();
+                        final Collection<String> observationTypes = getTypes(offering.getObservationTypes());
                         if (observationTypes != null && !observationTypes.isEmpty()) {
                             // FIXME why a loop? We are in SOS 2.0 context -> offering 1
                             // <-> 1 procedure!
@@ -581,8 +582,8 @@ public class GetCapabilitiesHandler extends AbstractGetCapabilitiesHandler {
                                 // insert observationTypes
                                 sosObservationOffering.setObservationTypes(observationTypes);
 
-                                if (offering.hasEnvelope()) {
-                                    sosObservationOffering.setObservedArea(processObservedArea(offering.getEnvelope()));
+                                if (offering.isSetGeometry()) {
+                                    sosObservationOffering.setObservedArea(processObservedArea(offering.getGeometry().getEnvelope()));
                                 } else if (getCache().hasEnvelopeForOffering(offering.getDomainId())) {
                                     sosObservationOffering.setObservedArea(getCache().getEnvelopeForOffering(offering.getDomainId()));
                                 }
@@ -861,8 +862,8 @@ public class GetCapabilitiesHandler extends AbstractGetCapabilitiesHandler {
     protected void setUpPhenomenaForOffering(OfferingEntity offering, ProcedureEntity procedure,
             SosObservationOffering sosOffering, Session session) throws DataAccessException {
         Map<String, String> map = Maps.newHashMap();
-        map.put(IoParameters.OFFERINGS, Long.toString(offering.getPkid()));
-        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getPkid()));
+        map.put(IoParameters.OFFERINGS, Long.toString(offering.getId()));
+        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getId()));
 
         List<PhenomenonEntity> observableProperties =
                 new PhenomenonDao(session).getAllInstances(new DbQuery(IoParameters.createFromSingleValueMap(map)));
@@ -911,8 +912,12 @@ public class GetCapabilitiesHandler extends AbstractGetCapabilitiesHandler {
 
     protected void setUpFeatureOfInterestTypesForOffering(OfferingEntity offering,
             SosObservationOffering sosOffering) {
-        sosOffering.setFeatureOfInterestTypes(offering.getFeatureTypes());
+        sosOffering.setFeatureOfInterestTypes(getTypes(offering.getFeatureTypes()));
     }
+
+    protected Collection<String> getTypes(Set<? extends TypeEntity<?>> observationTypes) {
+        return observationTypes.stream().map(o -> o.getType()).collect(Collectors.toSet());
+     }
 
     protected void setUpResponseFormatForOffering(SosObservationOffering sosOffering) {
         // initialize as new HashSet so that collection is modifiable
@@ -1029,7 +1034,7 @@ public class GetCapabilitiesHandler extends AbstractGetCapabilitiesHandler {
     private Collection<ProcedureEntity> getProceduresForOffering(final OfferingEntity offering, Session session)
             throws OwsExceptionReport, DataAccessException {
         Map<String, String> map = Maps.newHashMap();
-        map.put(IoParameters.OFFERINGS, Long.toString(offering.getPkid()));
+        map.put(IoParameters.OFFERINGS, Long.toString(offering.getId()));
         List<ProcedureEntity> procedures =
                 new ProcedureDao(session).getAllInstances(new DbQuery(IoParameters.createFromSingleValueMap(map)));
         // if (procedures.isEmpty()) {

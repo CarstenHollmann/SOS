@@ -38,11 +38,12 @@ import javax.inject.Inject;
 
 import org.hibernate.Session;
 import org.n52.io.request.IoParameters;
-import org.n52.proxy.db.dao.ProxyDatasetDao;
 import org.n52.series.db.DataAccessException;
 import org.n52.series.db.HibernateSessionStore;
 import org.n52.series.db.beans.DatasetEntity;
+import org.n52.series.db.beans.ObservationTypeEntity;
 import org.n52.series.db.beans.OfferingEntity;
+import org.n52.series.db.dao.DatasetDao;
 import org.n52.series.db.dao.DbQuery;
 import org.n52.shetland.ogc.filter.TemporalFilter;
 import org.n52.shetland.ogc.gml.ReferenceType;
@@ -66,7 +67,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandler implements ProxyQueryHelper {
+public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandler implements QueryHelper {
 
     private HibernateSessionStore sessionStore;
     private GetDataAvailabilityDao dao;
@@ -106,7 +107,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
         try {
             GDARequestContext context = new GDARequestContext(request);
             boolean gdaV20 = checkForGDAv20(request);
-            for (final DatasetEntity<?> entity : new ProxyDatasetDao<>(session).getAllInstances(createDbQuery(request))) {
+            for (final DatasetEntity entity : new DatasetDao<>(session).getAllInstances(createDbQuery(request))) {
                 if (gdaV20) {
                     processDataAvailabilityV2(entity, context, session);
                 } else {
@@ -143,7 +144,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
         return new DbQuery(IoParameters.createFromSingleValueMap(map));
     }
 
-    private DataAvailability defaultProcessDataAvailability(DatasetEntity<?> entity, GDARequestContext context, Session session) throws OwsExceptionReport {
+    private DataAvailability defaultProcessDataAvailability(DatasetEntity entity, GDARequestContext context, Session session) throws OwsExceptionReport {
             TimePeriod timePeriod = createTimePeriod(entity);
             if (timePeriod != null && !timePeriod.isEmpty()) {
                 DataAvailability dataAvailability =
@@ -171,7 +172,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private void processDataAvailability(DatasetEntity<?> entity, GDARequestContext context, Session session) throws OwsExceptionReport {
+    private void processDataAvailability(DatasetEntity entity, GDARequestContext context, Session session) throws OwsExceptionReport {
         DataAvailability dataAvailability = defaultProcessDataAvailability(entity, context, session);
         if (dataAvailability != null) {
             context.addDataAvailability(dataAvailability);
@@ -188,7 +189,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    private void processDataAvailabilityV2(DatasetEntity<?> entity, GDARequestContext context, Session session)
+    private void processDataAvailabilityV2(DatasetEntity entity, GDARequestContext context, Session session)
             throws OwsExceptionReport {
         DataAvailability dataAvailability = defaultProcessDataAvailability(entity, context, session);
         if (dataAvailability != null) {
@@ -201,7 +202,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
         checkForParentOfferings(context, entity.getOffering());
     }
 
-    private TimePeriod createTimePeriod(DatasetEntity<?> entity) {
+    private TimePeriod createTimePeriod(DatasetEntity entity) {
         return new TimePeriod(entity.getFirstValueAt(), entity.getLastValueAt());
     }
 
@@ -278,7 +279,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
         return checked;
     }
 
-    private ReferenceType getProcedureReference(DatasetEntity<?> entity, Map<String, ReferenceType> procedures) {
+    private ReferenceType getProcedureReference(DatasetEntity entity, Map<String, ReferenceType> procedures) {
         String identifier = entity.getProcedure().getDomainId();
         if (!procedures.containsKey(identifier)) {
             ReferenceType referenceType = new ReferenceType(identifier);
@@ -290,7 +291,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
         return procedures.get(identifier);
     }
 
-    private ReferenceType getObservedPropertyReference(DatasetEntity<?> entity, Map<String, ReferenceType> observableProperties) {
+    private ReferenceType getObservedPropertyReference(DatasetEntity entity, Map<String, ReferenceType> observableProperties) {
         String identifier = entity.getPhenomenon().getDomainId();
         if (!observableProperties.containsKey(identifier)) {
             ReferenceType referenceType = new ReferenceType(identifier);
@@ -302,7 +303,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
         return observableProperties.get(identifier);
     }
 
-    private ReferenceType getFeatureOfInterestReference(DatasetEntity<?> entity, Map<String, ReferenceType> featuresOfInterest) {
+    private ReferenceType getFeatureOfInterestReference(DatasetEntity entity, Map<String, ReferenceType> featuresOfInterest) {
         String identifier = entity.getFeature().getDomainId();
         if (!featuresOfInterest.containsKey(identifier)) {
             ReferenceType referenceType = new ReferenceType(identifier);
@@ -314,7 +315,7 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
         return featuresOfInterest.get(identifier);
     }
 
-    private ReferenceType getOfferingReference(DatasetEntity<?> entity, Map<String, ReferenceType> offerings){
+    private ReferenceType getOfferingReference(DatasetEntity entity, Map<String, ReferenceType> offerings){
         String identifier = entity.getOffering().getDomainId();
         if (!offerings.containsKey(identifier)) {
             ReferenceType referenceType = new ReferenceType(identifier);
@@ -377,16 +378,17 @@ public class GetDataAvailabilityHandler extends AbstractGetDataAvailabilityHandl
         return hasFilter;
     }
 
-    private FormatDescriptor getFormatDescriptor(GDARequestContext context, DatasetEntity<?> entity) {
+    private FormatDescriptor getFormatDescriptor(GDARequestContext context, DatasetEntity entity) {
         return new FormatDescriptor(
                 new ProcedureDescriptionFormatDescriptor(
-                        entity.getProcedure().getProcedureDescriptionFormat()),
+                        entity.getProcedure().getProcedureDescriptionFormat().getProcedureDescriptionFormat()),
                 getObservationFormatDescriptors(entity.getOffering(), context));
     }
 
     private Set<ObservationFormatDescriptor> getObservationFormatDescriptors(OfferingEntity entity, GDARequestContext context) {
         Map<String, Set<String>> responsFormatObservationTypesMap = Maps.newHashMap();
-        for (String observationType : entity.getObservationTypes()) {
+        for (ObservationTypeEntity observationTypeEntity : entity.getObservationTypes()) {
+            String observationType = observationTypeEntity.getType();
             Set<String> responseFormats = getResponseFormatsForObservationType(observationType, context.getRequest().getService(), context.getRequest().getVersion());
             for (String responseFormat : responseFormats) {
                 if (responsFormatObservationTypesMap.containsKey(responseFormat)) {

@@ -11,7 +11,7 @@
     <name>52°North SOS - Hibernate Module</name>
     <description>52°North SOS Hibernate Module</description>
     <modules>
-        <module>mappings</module>
+        <!-- <module>mappings</module> -->
         <module>session-factory</module>
         <module>common</module>
         <!-- <module>dao</module> -->

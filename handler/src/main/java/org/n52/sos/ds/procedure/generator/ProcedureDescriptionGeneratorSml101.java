@@ -60,8 +60,8 @@ class ProcedureDescriptionGeneratorSml101 extends AbstractProcedureDescriptionGe
                  new ProcedureDescriptionGeneratorKey(SensorMLConstants.SENSORML_OUTPUT_FORMAT_URL));
 
     public ProcedureDescriptionGeneratorSml101(ProfileHandler profileHandler, GeometryHandler geometryHandler,
-            I18NDAORepository i18ndaoRepository, ContentCacheController cacheController, String srsNamePrefixUrl) {
-        super(profileHandler, geometryHandler, i18ndaoRepository, cacheController, srsNamePrefixUrl);
+            I18NDAORepository i18ndaoRepository, ContentCacheController cacheController, String srsNamePrefixUrl, boolean addOutputsToSensorML) {
+        super(profileHandler, geometryHandler, i18ndaoRepository, cacheController, srsNamePrefixUrl, addOutputsToSensorML);
     }
 
     @Override

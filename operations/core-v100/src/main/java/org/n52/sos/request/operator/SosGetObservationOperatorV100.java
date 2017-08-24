@@ -144,7 +144,7 @@ public class SosGetObservationOperatorV100 extends
             exceptions.add(owse);
         }
         try {
-            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(),
+            checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(),
                     SosConstants.GetObservationParams.featureOfInterest.name());
             if (sosRequest.isSetFeatureOfInterest()) {
                 sosRequest.setFeatureIdentifiers(addChildFeatures(sosRequest.getFeatureIdentifiers()));

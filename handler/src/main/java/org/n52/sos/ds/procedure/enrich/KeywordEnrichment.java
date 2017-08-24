@@ -106,7 +106,7 @@ public class KeywordEnrichment extends SensorMLEnrichment {
         if (procedureSettings().isEnrichWithOfferings()) {
             for (String offering : getCache()
                     .getOfferingsForProcedure(getIdentifier())) {
-                if (getCache().getPublishedOfferings().contains(offering)) {
+                if (getCache().getOfferings().contains(offering)) {
                     keywords.add(offering);
                 }
             }
@@ -130,7 +130,7 @@ public class KeywordEnrichment extends SensorMLEnrichment {
     private void addObservableProperties(Set<String> keywords) {
         for (String obsProp : getCache()
                 .getObservablePropertiesForProcedure(getIdentifier())) {
-            if (getCache().getPublishedObservableProperties().contains(obsProp)) {
+            if (getCache().getObservableProperties().contains(obsProp)) {
                 keywords.add(obsProp);
             }
         }

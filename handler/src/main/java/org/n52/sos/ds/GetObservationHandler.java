@@ -37,11 +37,11 @@ import javax.inject.Inject;
 import org.hibernate.Session;
 import org.n52.iceland.exception.ows.concrete.NotYetSupportedException;
 import org.n52.io.request.IoParameters;
-import org.n52.proxy.db.dao.ProxyFeatureDao;
 import org.n52.series.db.DataAccessException;
 import org.n52.series.db.HibernateSessionStore;
 import org.n52.series.db.beans.FeatureEntity;
 import org.n52.series.db.dao.DbQuery;
+import org.n52.series.db.dao.FeatureDao;
 import org.n52.shetland.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
@@ -59,7 +59,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Envelope;
 
-public class GetObservationHandler extends AbstractGetObservationHandler implements ProxyQueryHelper {
+public class GetObservationHandler extends AbstractGetObservationHandler implements QueryHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GetObservationHandler.class);
 
@@ -96,7 +96,7 @@ public class GetObservationHandler extends AbstractGetObservationHandler impleme
             response.setVersion(request.getVersion());
             response.setResponseFormat(request.getResponseFormat());
             response.setResultModel(request.getResultModel());
-            List<FeatureEntity> features = new ProxyFeatureDao(session).getAllInstances(createDbQuery(request));
+            List<FeatureEntity> features = new FeatureDao(session).getAllInstances(createDbQuery(request));
             if (features == null || (features != null && features.isEmpty())) {
                 return response;
             }
@@ -145,12 +145,5 @@ public class GetObservationHandler extends AbstractGetObservationHandler impleme
         map.put(IoParameters.MATCH_DOMAIN_IDS, Boolean.toString(true));
         return new DbQuery(IoParameters.createFromSingleValueMap(map));
     }
-
-    private Double[] toArray(double x, double y) {
-        Double[] array = new Double[2];
-        array[0] = x;
-        array[1] = y;
-        return array;
-     }
 
 }

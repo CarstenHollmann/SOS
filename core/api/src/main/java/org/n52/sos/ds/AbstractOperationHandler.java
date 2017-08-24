@@ -167,7 +167,7 @@ public abstract class AbstractOperationHandler
     }
 
     protected OwsDomain getPublishedProcedureParameter(String service, String version) {
-        return getProcedureParameter(service, version, getCache().getPublishedProcedures());
+        return getProcedureParameter(service, version, getCache().getProcedures());
     }
 
     protected OwsDomain getFeatureOfInterestParameter(String service, String version) {
@@ -177,7 +177,7 @@ public abstract class AbstractOperationHandler
 
     protected OwsDomain getPublishedFeatureOfInterestParameter(String service, String version) {
         return getFeatureOfInterestParameter(service, version,
-                SosHelper.getFeatureIDs(getCache().getPublishedFeatureOfInterest(), version));
+                SosHelper.getFeatureIDs(getCache().getFeaturesOfInterest(), version));
     }
 
     protected OwsDomain getFeatureOfInterestParameter(String service, String version,
@@ -187,7 +187,7 @@ public abstract class AbstractOperationHandler
     }
 
     protected OwsDomain getPublishedObservablePropertyParameter(String service, String version) {
-        return getObservablePropertyParameter(service, version, getCache().getPublishedObservableProperties());
+        return getObservablePropertyParameter(service, version, getCache().getObservableProperties());
     }
 
     protected OwsDomain getObservablePropertyParameter(String service, String version) {

@@ -79,7 +79,7 @@ class ProcedureCacheUpdateTask extends AbstractThreadableDatasourceCacheUpdate {
         if (datasets != null) {
             String identifier = procedure.getDomainId();
             getCache().addProcedure(identifier);
-            getCache().addPublishedProcedure(identifier);
+            checkForTransactional();
             if (procedure.isSetName()) {
                 getCache().addProcedureIdentifierHumanReadableName(identifier, procedure.getName());
             }
@@ -91,7 +91,7 @@ class ProcedureCacheUpdateTask extends AbstractThreadableDatasourceCacheUpdate {
             if (procedure.hasParents()) {
                 Collection<String> parents = getParents(procedure);
                 getCache().addParentProcedures(identifier, parents);
-                getCache().addPublishedProcedures(parents);
+                getCache().addProcedures(parents);
             }
 
             TimePeriod phenomenonTime = new TimePeriod();
@@ -116,10 +116,10 @@ class ProcedureCacheUpdateTask extends AbstractThreadableDatasourceCacheUpdate {
         return parentProcedures;
     }
 
-    private DbQuery createDatasetDbQuery(ProcedureEntity procedure) {
-        Map<String, String> map = Maps.newHashMap();
-        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getPkid()));
-        return new DbQuery(IoParameters.createFromSingleValueMap(map));
+    private void checkForTransactional() {
+        if (datasets.stream().anyMatch(d -> !d.getObservationConstellation().isDisabled())) {
+            getCache().addTransactionalOffering(procedure.getIdentifier());
+        }
     }
 
     @Override

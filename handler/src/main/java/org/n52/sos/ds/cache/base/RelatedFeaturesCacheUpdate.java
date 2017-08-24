@@ -30,12 +30,12 @@ package org.n52.sos.ds.cache.base;
 
 import org.hibernate.HibernateException;
 import org.n52.io.request.IoParameters;
-import org.n52.proxy.db.beans.RelatedFeatureEntity;
-import org.n52.proxy.db.beans.RelatedFeatureRoleEntity;
-import org.n52.proxy.db.dao.ProxyRelatedFeatureDao;
 import org.n52.series.db.DataAccessException;
 import org.n52.series.db.beans.OfferingEntity;
+import org.n52.series.db.beans.RelatedFeatureEntity;
+import org.n52.series.db.beans.RelatedFeatureRoleEntity;
 import org.n52.series.db.dao.DbQuery;
+import org.n52.series.db.dao.RelatedFeatureDao;
 import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;
 import org.n52.sos.ds.cache.AbstractThreadableDatasourceCacheUpdate;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class RelatedFeaturesCacheUpdate extends AbstractThreadableDatasourceCach
         LOGGER.debug("Executing RelatedFeaturesCacheUpdate");
         startStopwatch();
         try {
-            for (RelatedFeatureEntity relatedFeature : new ProxyRelatedFeatureDao(getSession())
+            for (RelatedFeatureEntity relatedFeature : new RelatedFeatureDao(getSession())
                     .getAllInstances(new DbQuery(IoParameters.createDefaults()))) {
                 String identifier = relatedFeature.getFeature().getDomainId();
                 for (OfferingEntity offering : relatedFeature.getOfferings()) {

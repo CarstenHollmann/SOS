@@ -1065,7 +1065,7 @@ public class GetCapabilitiesDAO extends AbstractGetCapabilitiesHandler {
         }
         Collection<String> published = Sets.newHashSet();
         for (String procedure : procedures) {
-            if (getCache().getPublishedProcedures().contains(procedure)) {
+            if (getCache().getProcedures().contains(procedure)) {
                 published.add(procedure);
             }
         }

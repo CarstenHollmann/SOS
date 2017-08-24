@@ -3,6 +3,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
-    <bean class="org.n52.sos.ds.hibernate.SessionFactoryProvider" />
+    <bean name="sessionFactoryProvider" class="org.n52.sos.ds.hibernate.SessionFactoryProvider" />
 
 </beans>

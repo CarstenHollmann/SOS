@@ -52,8 +52,8 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.TObservableProperty;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.util.HibernateHelper;
-import org.n52.sos.ds.hibernate.util.ObservationConstellationInfo;
 import org.n52.sos.ds.hibernate.util.TimeExtrema;
+import org.n52.sw.suite.db.util.ObservationConstellationInfo;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

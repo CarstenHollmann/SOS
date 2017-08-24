@@ -36,13 +36,12 @@ import java.util.stream.Collectors;
 
 import org.hibernate.HibernateException;
 import org.n52.io.request.IoParameters;
-import org.n52.io.request.RequestSimpleParameterSet;
-import org.n52.proxy.db.dao.ProxyFeatureDao;
-import org.n52.proxy.db.dao.ProxyProcedureDao;
 import org.n52.series.db.DataAccessException;
 import org.n52.series.db.beans.FeatureEntity;
 import org.n52.series.db.beans.ProcedureEntity;
 import org.n52.series.db.dao.DbQuery;
+import org.n52.series.db.dao.FeatureDao;
+import org.n52.series.db.dao.ProcedureDao;
 import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;
 import org.n52.sos.ds.cache.AbstractThreadableDatasourceCacheUpdate;
 import org.slf4j.Logger;
@@ -65,8 +64,8 @@ public class FeatureOfInterestCacheUpdate extends AbstractThreadableDatasourceCa
         LOGGER.debug("Executing FeatureOfInterestCacheUpdate");
         startStopwatch();
         try {
-            List<FeatureEntity> features = new ProxyFeatureDao(getSession()).getAllInstances(new DbQuery(IoParameters.createDefaults()));
-            ProxyProcedureDao procedureDao = new ProxyProcedureDao(getSession());
+            List<FeatureEntity> features = new FeatureDao(getSession()).getAllInstances(new DbQuery(IoParameters.createDefaults()));
+            ProcedureDao procedureDao = new ProcedureDao(getSession());
             for (FeatureEntity featureEntity : features) {
                 String identifier = featureEntity.getDomainId();
                 getCache().addPublishedFeatureOfInterest(identifier);
@@ -96,7 +95,7 @@ public class FeatureOfInterestCacheUpdate extends AbstractThreadableDatasourceCa
 
     private DbQuery createProcedureDbQuery(FeatureEntity featureEntity) {
         Map<String, String> map = Maps.newHashMap();
-        map.put(IoParameters.FEATURES, Long.toString(featureEntity.getPkid()));
+        map.put(IoParameters.FEATURES, Long.toString(featureEntity.getId()));
         return new DbQuery(IoParameters.createFromSingleValueMap(map));
     }
 

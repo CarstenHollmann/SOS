@@ -180,7 +180,7 @@ public class AqdGetObservationOperatorV10 extends
             exceptions.add(owse);
         }
         try {
-            checkFeatureOfInterestIdentifiers(request.getFeatureIdentifiers(),
+            checkFeatureOfInterest(request.getFeatureIdentifiers(),
                     SosConstants.GetObservationParams.featureOfInterest.name());
             if (request.isSetFeatureOfInterest()) {
                 request.setFeatureIdentifiers(addChildFeatures(request.getFeatureIdentifiers()));

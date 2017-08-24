@@ -121,7 +121,7 @@ public class SosGetObservationOperatorV20 extends
             exceptions.add(owse);
         }
         try {
-            checkObservedProperties(sosRequest.getObservedProperties(), SosConstants.GetObservationParams.observedProperty, false);
+            checkObservedProperties(sosRequest.getObservedProperties(), SosConstants.GetObservationParams.observedProperty);
             // add child observedProperties if isInclude == true and requested observedProperty is parent.
             if (sosRequest.isSetObservableProperty()) {
                 sosRequest.setObservedProperties(addChildObservableProperties(sosRequest.getObservedProperties()));
@@ -140,7 +140,7 @@ public class SosGetObservationOperatorV20 extends
             exceptions.add(owse);
         }
         try {
-            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(),
+            checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(),
                     SosConstants.GetObservationParams.featureOfInterest.name());
             if (sosRequest.isSetFeatureOfInterest()) {
                 sosRequest.setFeatureIdentifiers(addChildFeatures(sosRequest.getFeatureIdentifiers()));

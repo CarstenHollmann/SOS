@@ -37,6 +37,7 @@ import org.n52.faroe.SettingsService;
 import org.n52.faroe.annotation.Setting;
 import org.n52.iceland.cache.ContentCacheController;
 import org.n52.iceland.i18n.I18NDAORepository;
+import org.n52.sos.request.ProcedureRequestSettingProvider;
 import org.n52.sos.service.profile.ProfileHandler;
 import org.n52.sos.util.GeometryHandler;
 import org.n52.svalbard.CodingSettings;
@@ -60,13 +61,7 @@ public class ProcedureDescriptionGeneratorFactorySml20 implements ProcedureDescr
     private final ContentCacheController cacheController;
     private final ProfileHandler profileHandler;
     private String srsNamePrefixUrl = "";
-
-    @Setting(CodingSettings.SRS_NAME_PREFIX_URL)
-    public void setSrsNamePrefixUrl(String srsNamePrefixUrl) {
-        if (!Strings.isNullOrEmpty(srsNamePrefixUrl)) {
-            this.srsNamePrefixUrl = srsNamePrefixUrl;
-        }
-    }
+    private boolean addOutputsToSensorML;
 
     @Inject
     public ProcedureDescriptionGeneratorFactorySml20(SettingsService settingsService,
@@ -81,6 +76,18 @@ public class ProcedureDescriptionGeneratorFactorySml20 implements ProcedureDescr
         this.profileHandler = profileHandler;
     }
 
+    @Setting(CodingSettings.SRS_NAME_PREFIX_URL)
+    public void setSrsNamePrefixUrl(String srsNamePrefixUrl) {
+        if (!Strings.isNullOrEmpty(srsNamePrefixUrl)) {
+            this.srsNamePrefixUrl = srsNamePrefixUrl;
+        }
+    }
+
+    @Setting(ProcedureRequestSettingProvider.ADD_OUTPUTS_TO_SENSOR_ML)
+    public void setAddOutputsToSensorML(final boolean addOutputsToSensorML) {
+        this.addOutputsToSensorML = addOutputsToSensorML;
+    }
+
     @Override
     public Set<ProcedureDescriptionGeneratorKey> getKeys() {
         return Collections.unmodifiableSet(ProcedureDescriptionGeneratorSml20.GENERATOR_KEY_TYPES);
@@ -93,7 +100,8 @@ public class ProcedureDescriptionGeneratorFactorySml20 implements ProcedureDescr
                                                                    getGeometryHandler(),
                                                                    getI18NDAORepository(),
                                                                    getCacheController(),
-                                                                   getSrsNamePrefixUrl());
+                                                                   getSrsNamePrefixUrl(),
+                                                                   getAddOutputsToSensorML());
         getSettingsService().configureOnce(key);
         return generator;
     }
@@ -120,5 +128,9 @@ public class ProcedureDescriptionGeneratorFactorySml20 implements ProcedureDescr
 
     public String getSrsNamePrefixUrl() {
         return srsNamePrefixUrl;
+    }
+
+    public boolean getAddOutputsToSensorML() {
+        return addOutputsToSensorML;
     }
 }

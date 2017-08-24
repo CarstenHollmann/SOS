@@ -238,7 +238,7 @@ public abstract class AbstractProcedureDescriptionGenerator implements Procedure
 
     private DbQuery createDbQuery(ProcedureEntity procedure) {
         Map<String, String> map = Maps.newHashMap();
-        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getPkid()));
+        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getId()));
         return new DbQuery(IoParameters.createFromSingleValueMap(map));
     }
 

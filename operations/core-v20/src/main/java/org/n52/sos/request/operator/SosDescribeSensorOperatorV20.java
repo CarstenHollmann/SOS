@@ -41,6 +41,7 @@ import javax.inject.Inject;
 
 import org.n52.faroe.ConfigurationError;
 import org.n52.faroe.Validation;
+import org.n52.faroe.annotation.Configurable;
 import org.n52.faroe.annotation.Setting;
 import org.n52.iceland.binding.BindingRepository;
 import org.n52.iceland.service.ServiceSettings;
@@ -94,12 +95,14 @@ import com.google.common.collect.Sets;
  * @since 4.0.0
  *
  */
+@Configurable
 public class SosDescribeSensorOperatorV20 extends
         AbstractV2RequestOperator<AbstractDescribeSensorHandler, DescribeSensorRequest, DescribeSensorResponse> {
     private static final String OPERATION_NAME = SosConstants.Operations.DescribeSensor.name();
     private PostProcessor postProcessor;
     private BindingRepository bindingRepository;
     private String serviceURL;
+    private boolean encodeFullChildrenInDescribeSensor;
 
     private static final Set<String> CONFORMANCE_CLASSES = Collections
             .singleton(ConformanceClasses.SOS_V2_CORE_PROFILE);
@@ -130,6 +133,15 @@ public class SosDescribeSensorOperatorV20 extends
 
     private String getServiceURL() {
         return serviceURL;
+    }
+
+    @Setting(ProcedureRequestSettingProvider.ENCODE_FULL_CHILDREN_IN_DESCRIBE_SENSOR)
+    public void setEncodeFullChildrenInDescribeSensor(final boolean encodeFullChildrenInDescribeSensor) {
+        this.encodeFullChildrenInDescribeSensor = encodeFullChildrenInDescribeSensor;
+    }
+
+    public boolean isEncodeFullChildrenInDescribeSensor() {
+        return encodeFullChildrenInDescribeSensor;
     }
 
     @Override
@@ -185,7 +197,7 @@ public class SosDescribeSensorOperatorV20 extends
 
     @Override
     protected OwsServiceResponse postProcessResponse(DescribeSensorResponse response) {
-        return super.postProcessResponse(postProcessor.process(response));
+        return super.postProcessResponse(postProcessor.process(response, isEncodeFullChildrenInDescribeSensor()));
     }
 
     private void checkProcedureDescriptionFromat(String procedureDescriptionFormat, DescribeSensorRequest sosRequest) throws MissingParameterValueException, OwsExceptionReport {
@@ -196,14 +208,8 @@ public class SosDescribeSensorOperatorV20 extends
     }
 
     private class PostProcessor {
-        private ProcedureRequestSettingProvider procedureRequestSettingProvider;
 
-        @Inject
-        public void setProcedureRequestSettingProvider(ProcedureRequestSettingProvider procedureRequestSettingProvider) {
-            this.procedureRequestSettingProvider = procedureRequestSettingProvider;
-        }
-
-        public DescribeSensorResponse process(DescribeSensorResponse response) {
+        public DescribeSensorResponse process(DescribeSensorResponse response, boolean encodeFullChildrenInDescribeSensor) {
             if (response.isSetProcedureDescriptions()) {
                 for (SosProcedureDescription<?> procedureDescription : response.getProcedureDescriptions()) {
                     if (procedureDescription.getProcedureDescription() instanceof AbstractProcess) {
@@ -245,7 +251,7 @@ public class SosDescribeSensorOperatorV20 extends
                         }
                         if (procedureDescription.isSetChildProcedures() && abstractProcess instanceof HasComponents) {
                             List<SmlComponent> smlComponents = Lists.newArrayList();
-                            smlComponents.addAll(createComponentsForChildProcedures(procedureDescription.getChildProcedures()));
+                            smlComponents.addAll(createComponentsForChildProcedures(procedureDescription.getChildProcedures(), encodeFullChildrenInDescribeSensor));
                             abstractProcess.getOutputs().addAll(getOutputsFromChilds(smlComponents));
                             ((HasComponents)abstractProcess).addComponents(smlComponents);
                         }
@@ -531,7 +537,7 @@ public class SosDescribeSensorOperatorV20 extends
          * @throws EncodingException
          *             If an error occurs
          */
-        private List<SmlComponent> createComponentsForChildProcedures(final Set<AbstractSensorML> set) {
+        private List<SmlComponent> createComponentsForChildProcedures(final Set<AbstractSensorML> set, boolean encodeFullChildrenInDescribeSensor) {
             final List<SmlComponent> smlComponents = Lists.newLinkedList();
             int childCount = 0;
             for (final AbstractSensorML childProcedure : set) {
@@ -539,7 +545,7 @@ public class SosDescribeSensorOperatorV20 extends
                 final SmlComponent component = new SmlComponent("component" + childCount);
                 component.setTitle(childProcedure.getIdentifier());
 
-                if (procedureRequestSettingProvider.isEncodeFullChildrenInDescribeSensor()) {
+                if (encodeFullChildrenInDescribeSensor) {
                     component.setProcess(childProcedure);
                 } else {
                     if (getBindingRepository().isBindingSupported(MediaTypes.APPLICATION_KVP)) {

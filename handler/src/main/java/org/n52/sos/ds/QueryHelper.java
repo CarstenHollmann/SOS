@@ -32,7 +32,7 @@ import java.util.Collection;
 
 import com.google.common.base.Joiner;
 
-public interface ProxyQueryHelper {
+public interface QueryHelper {
 
     default String listToString(Collection<String> values) {
         return Joiner.on(",").join(values);

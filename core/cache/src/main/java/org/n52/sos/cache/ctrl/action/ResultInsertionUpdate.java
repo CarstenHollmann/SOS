@@ -117,7 +117,6 @@ public class ResultInsertionUpdate extends InMemoryCacheUpdate {
             for (AbstractSamplingFeature sosSamplingFeature : observedFeatures) {
                 final String featureOfInterest = sosSamplingFeature.getIdentifierCodeWithAuthority().getValue();
                 cache.addFeatureOfInterest(featureOfInterest);
-            cache.addPublishedFeatureOfInterest(featureOfInterest);
                 cache.addFeatureOfInterestForResultTemplate(templateIdentifier, featureOfInterest);
                 cache.addProcedureForFeatureOfInterest(featureOfInterest, procedure);
                 for (String offering : observation.getObservationConstellation().getOfferings()) {

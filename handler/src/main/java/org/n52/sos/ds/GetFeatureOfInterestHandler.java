@@ -42,11 +42,11 @@ import javax.inject.Inject;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.n52.io.request.IoParameters;
-import org.n52.proxy.db.dao.ProxyFeatureDao;
 import org.n52.series.db.DataAccessException;
 import org.n52.series.db.HibernateSessionStore;
 import org.n52.series.db.beans.FeatureEntity;
 import org.n52.series.db.dao.DbQuery;
+import org.n52.series.db.dao.FeatureDao;
 import org.n52.shetland.ogc.filter.FilterConstants.SpatialOperator;
 import org.n52.shetland.ogc.filter.SpatialFilter;
 import org.n52.shetland.ogc.gml.AbstractFeature;
@@ -72,7 +72,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Envelope;
 
-public class GetFeatureOfInterestHandler extends AbstractGetFeatureOfInterestHandler implements ProxyQueryHelper {
+public class GetFeatureOfInterestHandler extends AbstractGetFeatureOfInterestHandler implements QueryHelper {
 
     private HibernateSessionStore sessionStore;
     private GetFeatureOfInterestDao dao;
@@ -175,7 +175,7 @@ public class GetFeatureOfInterestHandler extends AbstractGetFeatureOfInterestHan
             sampFeat.setDescription(feature.getDescription());
         }
         if (feature.isSetGeometry()) {
-            sampFeat.setGeometry(getGeometryHandler().switchCoordinateAxisFromToDatasourceIfNeeded(feature.getGeometry()));
+            sampFeat.setGeometry(getGeometryHandler().switchCoordinateAxisFromToDatasourceIfNeeded(feature.getGeometryEntity().getGeometry()));
         }
         final Set<FeatureEntity> parentFeatures = feature.getParents();
         if (parentFeatures != null && !parentFeatures.isEmpty()) {
@@ -201,7 +201,7 @@ public class GetFeatureOfInterestHandler extends AbstractGetFeatureOfInterestHan
     private List<FeatureEntity> queryFeaturesForParameter(GetFeatureOfInterestRequest req, Session session)
             throws OwsExceptionReport {
         try {
-            return new ProxyFeatureDao(session).getAllInstances(createDbQuery(req));
+            return new FeatureDao(session).getAllInstances(createDbQuery(req));
         } catch (DataAccessException dae) {
             throw new NoApplicableCodeException().causedBy(dae)
                     .withMessage("Error while querying data for GetFeatureOfInterest!");
@@ -253,13 +253,6 @@ public class GetFeatureOfInterestHandler extends AbstractGetFeatureOfInterestHan
             return geometry.getEnvelope().get().getEnvelope();
         }
         return null;
-    }
-
-    private Double[] toArray(double x, double y) {
-       Double[] array = new Double[2];
-       array[0] = x;
-       array[1] = y;
-       return array;
     }
 
     /**

@@ -1221,51 +1221,39 @@ public interface SosWritableContentCache
 
     void clearTypeOfProcedure();
 
-    void addPublishedFeatureOfInterest(String featureOfInterest);
+    void addTransactionalProcedure(String procedure);
 
-    void addPublishedFeaturesOfInterest(Collection<String> featuresOfInterest);
+    void addTransactionalProcedures(Collection<String> procedure);
 
-    void setPublishedFeaturesOfInterest(Collection<String> featuresOfInterest);
+    void setTransactionalProcedures(Collection<String> procedures);
 
-    void clearPublishedFeaturesOfInterest();
+    void clearTransactionalProcedure();
 
-    void removePublishedFeatureOfInterest(String featureOfInterest);
+    void removeTransactionalProcedure(String procedure);
 
-    void removePublishedFeaturesOfInterest(Collection<String> featuresOfInterest);
+    void removeTransactionalProcedures(Collection<String> procedures);
 
-    void addPublishedProcedure(String procedure);
+    void addTransactionalOffering(String offering);
 
-    void addPublishedProcedures(Collection<String> procedure);
+    void addTransactionalOfferings(Collection<String> offerings);
 
-    void setPublishedProcedures(Collection<String> procedures);
+    void setTransactionalOfferings(Collection<String> offerings);
 
-    void clearPublishedProcedure();
+    void clearTransactionalOffering();
 
-    void removePublishedProcedure(String procedure);
+    void removeTransactionalOffering(String offering);
 
-    void removePublishedProcedures(Collection<String> procedures);
+    void removeTransactionalOfferings(Collection<String> offerings);
 
-    void addPublishedOffering(String offering);
+    void addTransactionalObservableProperty(String observableProperty);
 
-    void addPublishedOfferings(Collection<String> offerings);
+    void addTransactionalObservableProperties(Collection<String> observableProperties);
 
-    void setPublishedOfferings(Collection<String> offerings);
+    void setTransactionalObservableProperties(Collection<String> observableProperties);
 
-    void clearPublishedOffering();
+    void clearTransactionalObservableProperty();
 
-    void removePublishedOffering(String offering);
+    void removeTransactionalObservableProperty(String observableProperty);
 
-    void removePublishedOfferings(Collection<String> offerings);
-
-    void addPublishedObservableProperty(String observableProperty);
-
-    void addPublishedObservableProperties(Collection<String> observableProperties);
-
-    void setPublishedObservableProperties(Collection<String> observableProperties);
-
-    void clearPublishedObservableProperty();
-
-    void removePublishedObservableProperty(String observableProperty);
-
-    void removePublishedObservableProperties(Collection<String> observableProperties);
+    void removeTransactionalObservableProperties(Collection<String> observableProperties);
 }

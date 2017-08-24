@@ -54,8 +54,8 @@ import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.util.HibernateHelper;
-import org.n52.sos.ds.hibernate.util.ObservationConstellationInfo;
 import org.n52.sos.service.Configurator;
+import org.n52.sw.suite.db.util.ObservationConstellationInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

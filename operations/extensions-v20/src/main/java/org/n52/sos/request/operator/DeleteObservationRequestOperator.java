@@ -103,7 +103,7 @@ public class DeleteObservationRequestOperator
                 exceptions.add(owse);
             }
             try {
-                checkObservedProperties(sosRequest.getObservedProperties(), DeleteObservationConstants.PARAM_OBSERVED_PROPERTY, false);
+                checkObservedProperties(sosRequest.getObservedProperties(), DeleteObservationConstants.PARAM_OBSERVED_PROPERTY);
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }
@@ -113,7 +113,7 @@ public class DeleteObservationRequestOperator
                 exceptions.add(owse);
             }
             try {
-                checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(), DeleteObservationConstants.PARAM_FEATURE_OF_INTEREST);
+                checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(), DeleteObservationConstants.PARAM_FEATURE_OF_INTEREST);
             } catch (OwsExceptionReport owse) {
                 exceptions.add(owse);
             }

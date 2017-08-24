@@ -777,18 +777,57 @@ public interface SosContentCache
      *
      * @return the procedures
      */
-    Set<String> getTransactionalObservationProcedures();
+    Set<String> getTransactionalProcedures();
 
     /**
      * Checks whether the specified procedure exists for transactional insert
      * observation operations (InsertObservation, InsertResultTemplate).
      *
-     * @param procedureID
+     * @param procedure
      *            the procedure
      *
      * @return {@code true} if it exists
      */
-    boolean hasTransactionalObservationProcedure(String procedureID);
+    boolean hasTransactionalProcedure(String procedure);
+
+    /**
+     * Get offerings usable for transactional insert observation operations
+     * (InsertObservation, InsertResultTemplate).
+     *
+     * @return the offerings
+     */
+    Set<String> getTransactionalOfferings();
+
+    /**
+     * Checks whether the specified offering exists for transactional insert
+     * observation operations (InsertObservation, InsertResultTemplate).
+     *
+     * @param offering
+     *            the offering
+     *
+     * @return {@code true} if it exists
+     */
+    boolean hasTransactionalOffering(String offering);
+
+    /**
+     * Get observableProperties usable for transactional insert observation operations
+     * (InsertObservation, InsertResultTemplate).
+     *
+     * @return the observableProperties
+     */
+    Set<String> getTransactionalObservableProperties();
+
+    /**
+     * Checks whether the specified observableProperty exists for transactional insert
+     * observation operations (InsertObservation, InsertResultTemplate).
+     *
+     * @param observableProperty
+     *            the observableProperty
+     *
+     * @return {@code true} if it exists
+     */
+    boolean hasTransactionalObservableProperty(String observableProperty);
+
 
     /**
      * Get procedures usable for querying.
@@ -815,14 +854,6 @@ public interface SosContentCache
     boolean hasInstancesForProcedure(String identifier);
 
     Set<String> getProcedureDescriptionFormatsForProcedure(String procedure);
-
-    Set<String> getPublishedFeatureOfInterest();
-
-    Set<String> getPublishedProcedures();
-
-    Set<String> getPublishedOfferings();
-
-    Set<String> getPublishedObservableProperties();
 
     enum TypeInstance {
         TYPE, INSTANCE;

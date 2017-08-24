@@ -74,7 +74,7 @@ public class ObservablePropertyEnrichment
     private Set<String> checkForPublished(Set<String> ids) {
         Set<String> obsProps = new HashSet<>();
         for (String id : ids) {
-            if (getCache().getPublishedObservableProperties().contains(id)) {
+            if (getCache().getObservableProperties().contains(id)) {
                 obsProps.add(id);
             }
         }

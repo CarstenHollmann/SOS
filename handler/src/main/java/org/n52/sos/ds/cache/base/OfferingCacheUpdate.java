@@ -38,13 +38,14 @@ import org.hibernate.HibernateException;
 import org.n52.iceland.exception.ows.concrete.GenericThrowableWrapperException;
 import org.n52.iceland.i18n.I18NDAORepository;
 import org.n52.io.request.IoParameters;
-import org.n52.proxy.db.dao.ProxyDatasetDao;
-import org.n52.proxy.db.dao.ProxyOfferingDao;
+import org.n52.io.request.Parameters;
 import org.n52.series.db.DataAccessException;
 import org.n52.series.db.HibernateSessionStore;
 import org.n52.series.db.beans.DatasetEntity;
 import org.n52.series.db.beans.OfferingEntity;
+import org.n52.series.db.dao.DatasetDao;
 import org.n52.series.db.dao.DbQuery;
+import org.n52.series.db.dao.OfferingDao;
 import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.sos.ds.cache.AbstractQueueingDatasourceCacheUpdate;
@@ -63,7 +64,7 @@ import com.google.common.collect.Lists;
 public class OfferingCacheUpdate extends AbstractQueueingDatasourceCacheUpdate<OfferingCacheUpdateTask> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OfferingCacheUpdate.class);
     private static final String THREAD_GROUP_NAME = "offering-cache-update";
-    private ProxyOfferingDao offeringDAO;
+    private OfferingDao offeringDAO;
     private Collection<String> offeringsIdToUpdate = Lists.newArrayList();
     private Collection<OfferingEntity> offeringsToUpdate;
     private Map<String,Collection<DatasetEntity>> offDatasetMap;
@@ -86,13 +87,13 @@ public class OfferingCacheUpdate extends AbstractQueueingDatasourceCacheUpdate<O
     private Collection<OfferingEntity> getOfferingsToUpdate() {
         try {
             if (offeringDAO == null) {
-                offeringDAO = new ProxyOfferingDao(getSession());
+                offeringDAO = new OfferingDao(getSession());
             }
             if (offeringsToUpdate == null) {
                 if (offeringsIdToUpdate == null || (offeringsIdToUpdate != null && offeringsIdToUpdate.isEmpty())) {
-                    return offeringDAO.getAllInstances(new DbQuery(IoParameters.createDefaults()));
+                    return offeringDAO.get();
                 } else {
-                    return offeringDAO.getInstancesFor(offeringsIdToUpdate);
+                    return offeringDAO.get(offeringsIdToUpdate);
                 }
             }
         } catch (Exception e) {
@@ -107,7 +108,7 @@ public class OfferingCacheUpdate extends AbstractQueueingDatasourceCacheUpdate<O
         if (offDatasetMap == null) {
             try {
                 offDatasetMap = DatasourceCacheUpdateHelper.mapByOffering(
-                    new ProxyDatasetDao(getSession()).getAllInstances(new DbQuery(IoParameters.createDefaults())));
+                    new DatasetDao(getSession()).getAllInstances(new DbQuery(IoParameters.createDefaults())));
             } catch (HibernateException | DataAccessException dae) {
                 throw new NoApplicableCodeException().causedBy(dae).withMessage("Error while querying datasets for offerings");
             }

@@ -99,7 +99,7 @@ public class GetDataAvailabilityOperator
 
         try {
             checkObservedProperties(request.getObservedProperties(),
-                    GetDataAvailabilityParams.observedProperty.name(), false);
+                    GetDataAvailabilityParams.observedProperty.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -113,7 +113,7 @@ public class GetDataAvailabilityOperator
             exceptions.add(owse);
         }
         try {
-            checkFeatureOfInterestIdentifiers(request.getFeaturesOfInterest(),
+            checkFeatureOfInterest(request.getFeaturesOfInterest(),
                     GetDataAvailabilityParams.featureOfInterest.name());
             if (request.isSetFeaturesOfInterest()) {
                 request.setFeatureOfInterest(addChildFeatures(request.getFeaturesOfInterest()));

@@ -30,13 +30,11 @@ package org.n52.sos.cache.ctrl.action;
 
 import java.util.Set;
 
-import org.n52.sos.cache.InMemoryCacheImpl;
-import org.n52.sos.cache.SosWritableContentCache;
-import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.iceland.util.action.Action;
-import org.n52.sos.ds.CacheFeederHandler;
+import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.shetland.ogc.sos.request.DeleteSensorRequest;
-
+import org.n52.sos.cache.SosWritableContentCache;
+import org.n52.sos.ds.CacheFeederHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +73,7 @@ public class SensorDeletionUpdate extends CacheFeederDAOCacheUpdate {
         final String procedure = request.getProcedureIdentifier();
 
         cache.removeProcedure(procedure);
-        cache.removePublishedProcedure(procedure);
+        cache.removeTransactionalProcedure(procedure);
 
         cache.removeMinPhenomenonTimeForProcedure(procedure);
         cache.removeMaxPhenomenonTimeForProcedure(procedure);
@@ -119,7 +117,7 @@ public class SensorDeletionUpdate extends CacheFeederDAOCacheUpdate {
                     cache.removeObservablePropertiesForResultTemplate(resultTemplate);
                 }
                 cache.removeOffering(offering);
-                cache.removePublishedOffering(offering);
+                cache.removeTransactionalOffering(offering);
             }
         }
 
@@ -131,7 +129,6 @@ public class SensorDeletionUpdate extends CacheFeederDAOCacheUpdate {
 
         cache.removeRolesForRelatedFeatureNotIn(cache.getRelatedFeatures());
         cache.setFeaturesOfInterest(cache.getFeaturesOfInterestWithOffering());
-        cache.setPublishedFeaturesOfInterest(cache.getFeaturesOfInterestWithOffering());
 
         // observable property relations
         for (String observableProperty : cache.getObservablePropertiesForProcedure(procedure)) {

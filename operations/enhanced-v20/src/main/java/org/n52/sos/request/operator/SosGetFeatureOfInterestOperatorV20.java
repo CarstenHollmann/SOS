@@ -88,7 +88,7 @@ public class SosGetFeatureOfInterestOperatorV20
         }
         try {
             checkObservedProperties(request.getObservedProperties(),
-                    Sos2Constants.GetFeatureOfInterestParams.observedProperty.name(), false);
+                    Sos2Constants.GetFeatureOfInterestParams.observedProperty.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);
         }
@@ -104,7 +104,7 @@ public class SosGetFeatureOfInterestOperatorV20
         try {
 //            checkFeatureOfInterestAndRelatedFeatureIdentifier(sosRequest.getFeatureIdentifiers(),
 //                    Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
-            checkFeatureOfInterestIdentifiers(request.getFeatureIdentifiers(), Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
+            checkFeatureOfInterest(request.getFeatureIdentifiers(), Sos2Constants.GetFeatureOfInterestParams.featureOfInterest.name());
             if (request.isSetFeatureOfInterestIdentifiers()) {
                 request.setFeatureIdentifiers(addChildFeatures(request.getFeatureIdentifiers()));
             }
@@ -128,7 +128,7 @@ public class SosGetFeatureOfInterestOperatorV20
             for (String featureOfInterest : featureIdentifiers) {
                 try {
                     if (!getCache().hasRelatedFeature(featureOfInterest)) {
-                        checkFeatureOfInterestIdentifier(featureOfInterest, parameterName);
+                        checkFeatureOfInterest(featureOfInterest, parameterName);
                     }
                 } catch (OwsExceptionReport e) {
                     exceptions.add(e);

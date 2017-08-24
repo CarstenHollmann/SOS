@@ -89,10 +89,10 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
 
         // procedure relations
         cache.addProcedure(procedure);
+        cache.addTransactionalProcedure(procedure);
         if (request.getProcedureDescription().isSetParentProcedure()) {
-            cache.addPublishedProcedure(procedure);
             cache.addParentProcedures(procedure, Sets.newHashSet(request.getProcedureDescription().getParentProcedure().getTitleOrFromHref()));
-            cache.addPublishedProcedure(request.getProcedureDescription().getParentProcedure().getHref());
+            cache.addProcedure(request.getProcedureDescription().getParentProcedure().getHref());
         }
 
         // Update procedureDescriptionFormats
@@ -113,7 +113,7 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
                     cache.addHiddenChildProcedureForOffering(sosOffering.getIdentifier(), procedure);
                 } else {
                     cache.addOffering(sosOffering.getIdentifier());
-                    cache.addPublishedOffering(sosOffering.getIdentifier());
+                    cache.addTransactionalOffering(sosOffering.getIdentifier());
                     cache.addProcedureForOffering(sosOffering.getIdentifier(), procedure);
                     if (sosOffering.isSetName()) {
                         cache.setNameForOffering(sosOffering.getIdentifier(), sosOffering.getOfferingName());
@@ -154,7 +154,7 @@ public class SensorInsertionUpdate extends InMemoryCacheUpdate {
                     cache.addOfferingForObservableProperty(observableProperty, sosOffering.getIdentifier());
                     cache.addObservablePropertyForOffering(sosOffering.getIdentifier(), observableProperty);
                 }
-                cache.addPublishedObservableProperty(observableProperty);
+                cache.addTransactionalObservableProperty(observableProperty);
             }
         }
 

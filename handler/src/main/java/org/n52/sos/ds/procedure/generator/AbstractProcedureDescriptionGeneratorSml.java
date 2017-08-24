@@ -34,11 +34,9 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.n52.faroe.annotation.Setting;
 import org.n52.iceland.cache.ContentCacheController;
 import org.n52.iceland.i18n.I18NDAORepository;
 import org.n52.io.request.IoParameters;
-import org.n52.io.request.RequestSimpleParameterSet;
 import org.n52.janmayen.http.HTTPStatus;
 import org.n52.series.db.DataAccessException;
 import org.n52.series.db.beans.DatasetEntity;
@@ -67,10 +65,8 @@ import org.n52.shetland.ogc.swe.simpleType.SweCount;
 import org.n52.shetland.ogc.swe.simpleType.SweQuantity;
 import org.n52.shetland.ogc.swe.simpleType.SweText;
 import org.n52.shetland.util.JavaHelper;
-import org.n52.sos.request.ProcedureRequestSettingProvider;
 import org.n52.sos.service.profile.ProfileHandler;
 import org.n52.sos.util.GeometryHandler;
-import org.n52.svalbard.CodingSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,17 +90,17 @@ public abstract class AbstractProcedureDescriptionGeneratorSml extends AbstractP
     protected static final String POSITION_NAME = "sensorPosition";
 
     private GeometryHandler geometryHandler;
-
     private String srsNamePrefix;
-
     private ProfileHandler profileHandler;
+    private boolean addOutputsToSensorML;
 
     public AbstractProcedureDescriptionGeneratorSml(ProfileHandler profileHandler, GeometryHandler geometryHandler,
-            I18NDAORepository i18NDAORepository, ContentCacheController cacheController, String srsNamePrefix) {
+            I18NDAORepository i18NDAORepository, ContentCacheController cacheController, String srsNamePrefix, boolean addOutputsToSensorML) {
         super(i18NDAORepository, cacheController);
         this.geometryHandler = geometryHandler;
         this.srsNamePrefix = srsNamePrefix;
         this.profileHandler = profileHandler;
+        this.addOutputsToSensorML = addOutputsToSensorML;
     }
 
     /**
@@ -130,7 +126,7 @@ public abstract class AbstractProcedureDescriptionGeneratorSml extends AbstractP
         abstractProcess.setIdentifications(createIdentifications(identifier));
 
         // 7 set inputs/outputs --> observableProperties
-        if (ProcedureRequestSettingProvider.getInstance().isAddOutputsToSensorML()
+        if (addOutputsToSensorML
                 && !"hydrology".equalsIgnoreCase(profileHandler.getActiveProfile().getIdentifier())) {
             abstractProcess.setInputs(createInputs(getIdentifierList(observableProperties)));
             abstractProcess.setOutputs(createOutputs(procedure, observableProperties, session));
@@ -243,14 +239,14 @@ public abstract class AbstractProcedureDescriptionGeneratorSml extends AbstractP
 
     private DbQuery createDbQuery(ProcedureEntity procedure, PhenomenonEntity observableProperty) {
         Map<String, String> map = Maps.newHashMap();
-        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getPkid()));
-        map.put(IoParameters.PHENOMENA, Long.toString(observableProperty.getPkid()));
+        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getId()));
+        map.put(IoParameters.PHENOMENA, Long.toString(observableProperty.getId()));
         return new DbQuery(IoParameters.createFromSingleValueMap(map));
     }
 
     private DbQuery createDbQuery(ProcedureEntity procedure) {
         Map<String, String> map = Maps.newHashMap();
-        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getPkid()));
+        map.put(IoParameters.PROCEDURES, Long.toString(procedure.getId()));
         return new DbQuery(IoParameters.createFromSingleValueMap(map));
     }
 
@@ -279,11 +275,11 @@ public abstract class AbstractProcedureDescriptionGeneratorSml extends AbstractP
             SmlPosition position = new SmlPosition();
             position.setName(POSITION_NAME);
             position.setFixed(true);
-            int srid = GeometryHandler.getInstance().getDefaultResponseEPSG();
+            int srid = geometryHandler.getDefaultResponseEPSG();
             if (features != null && features.size() == 1) {
                 FeatureEntity feature = features.iterator().next();
                 if (feature.isSetGeometry()) {
-                    Geometry geometry = feature.getGeometry(Integer.toString(srid));
+                    Geometry geometry = feature.getGeometry();
                     // 8.2 set position from geometry
                     Coordinate c = geometry.getCoordinate();
                     position.setPosition(createCoordinatesForPosition(c.y, c.x, c.z));

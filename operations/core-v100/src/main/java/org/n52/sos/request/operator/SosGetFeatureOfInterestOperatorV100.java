@@ -65,7 +65,7 @@ public class SosGetFeatureOfInterestOperatorV100
             exceptions.add(owse);
         }
         try {
-            checkFeatureOfInterestIdentifiers(sosRequest.getFeatureIdentifiers(),
+            checkFeatureOfInterest(sosRequest.getFeatureIdentifiers(),
                     Sos1Constants.GetFeatureOfInterestParams.featureOfInterestID.name());
         } catch (OwsExceptionReport owse) {
             exceptions.add(owse);

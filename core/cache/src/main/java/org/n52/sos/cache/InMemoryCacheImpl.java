@@ -44,6 +44,8 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.joda.time.DateTime;
+import org.n52.faroe.annotation.Configurable;
+import org.n52.faroe.annotation.Setting;
 import org.n52.janmayen.function.Functions;
 import org.n52.janmayen.function.Predicates;
 import org.n52.janmayen.function.Suppliers;
@@ -64,6 +66,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Envelope;
 
+@Configurable
 public class InMemoryCacheImpl extends AbstractStaticSosContentCache implements SosWritableContentCache, CacheConstants {
     private static final Logger LOG = LoggerFactory.getLogger(InMemoryCacheImpl.class);
     private static final long serialVersionUID = 3630601584420744019L;
@@ -129,10 +132,27 @@ public class InMemoryCacheImpl extends AbstractStaticSosContentCache implements 
     private ReferencedEnvelope globalEnvelope = new ReferencedEnvelope(null, defaultEpsgCode);
     private DateTime updateTime;
     private final Map<String, Set<String>> procedureProcedureDescriptionFormats = newSynchronizedMap();
-    private Set<String> publishedFeatureOfInterest = newSynchronizedSet();
-    private Set<String> publishedProcedure= newSynchronizedSet();
-    private Set<String> publishedOffering = newSynchronizedSet();
-    private Set<String> publishedObservableProperty = newSynchronizedSet();
+    private Set<String> transactionalProcedures= newSynchronizedSet();
+    private Set<String> transactionalOfferings = newSynchronizedSet();
+    private Set<String> transactionalObservableProperties = newSynchronizedSet();
+    private boolean allowQueryingForInstancesOnly;
+    private boolean showOnlyAggregatedProcedures;
+
+    /**
+     * @param allowQueryingForInstancesOnly the allowQueryingForInstancesOnly to set
+     */
+    @Setting(ProcedureRequestSettingProvider.ALLOW_QUERYING_FOR_INSTANCES_ONLY)
+    public void setAllowQueryingForInstancesOnly(boolean allowQueryingForInstancesOnly) {
+        this.allowQueryingForInstancesOnly = allowQueryingForInstancesOnly;
+    }
+
+    /**
+     * @param showOnlyAggregatedProcedures the showOnlyAggregatedProcedures to set
+     */
+    @Setting(ProcedureRequestSettingProvider.SHOW_ONLY_AGGREGATED_PROCEDURES)
+    public void setShowOnlyAggregatedProcedures(boolean showOnlyAggregatedProcedures) {
+        this.showOnlyAggregatedProcedures = showOnlyAggregatedProcedures;
+    }
 
     @Override
     public DateTime getLastUpdateTime() {
@@ -2452,27 +2472,46 @@ public class InMemoryCacheImpl extends AbstractStaticSosContentCache implements 
     }
 
     @Override
-    public Set<String> getTransactionalObservationProcedures() {
-        return CollectionHelper.union(
-                CollectionHelper.union(copyOf(hiddenChildProceduresForOfferings.values())),
-                CollectionHelper.union(copyOf(proceduresForOfferings.values())));
+    public Set<String> getTransactionalProcedures() {
+//        return CollectionHelper.union(
+//                CollectionHelper.union(copyOf(hiddenChildProceduresForOfferings.values())),
+//                CollectionHelper.union(copyOf(proceduresForOfferings.values())));
+        return copyOf(transactionalProcedures);
     }
 
     @Override
-    public boolean hasTransactionalObservationProcedure(String procedureID) {
-        return getTransactionalObservationProcedures().contains(procedureID);
+    public boolean hasTransactionalProcedure(String procedure) {
+        return getTransactionalProcedures().contains(procedure);
+    }
+
+    @Override
+    public Set<String> getTransactionalOfferings() {
+        return copyOf(transactionalOfferings);
+    }
+
+    @Override
+    public boolean hasTransactionalOffering(String offering) {
+        return getTransactionalOfferings().contains(offering);
+    }
+
+    @Override
+    public Set<String> getTransactionalObservableProperties() {
+        return copyOf(transactionalObservableProperties);
+    }
+
+    @Override
+    public boolean hasTransactionalObservableProperty(String observedProperty) {
+        return getTransactionalObservableProperties().contains(observedProperty);
     }
 
     @Override
     public Set<String> getQueryableProcedures() {
-        Set<String> procedures = getPublishedProcedures();
-        // allowQueryingForInstancesOnly
-        if (ProcedureRequestSettingProvider.getInstance().isAllowQueryingForInstancesOnly()) {
+        Set<String> procedures = getProcedures();
+        if (allowQueryingForInstancesOnly) {
             procedures = CollectionHelper
                     .conjunctCollectionsToSet(procedures, getTypeInstanceProcedure(TypeInstance.INSTANCE));
         }
-        // showOnlyAggregatedProcedures
-        if (ProcedureRequestSettingProvider.getInstance().isShowOnlyAggregatedProcedures()) {
+        if (showOnlyAggregatedProcedures) {
             procedures = CollectionHelper
                     .conjunctCollectionsToSet(procedures, getComponentAggregationProcedure(ComponentAggregation.AGGREGATION));
 
@@ -2604,36 +2643,6 @@ public class InMemoryCacheImpl extends AbstractStaticSosContentCache implements 
         typeOfProceduresMap.clear();
     }
 
-    /**
-     * Logs to trace: "Adding 'value' to 'type'".
-     *
-     * @param type  Add to
-     * @param value Value to add
-     */
-    protected void logAdding(String type, String value) {
-        LOG.trace("Adding '{}' to '{}'", value, type);
-    }
-
-    /**
-     * Logs to trace: "Removing 'value' from 'type'".
-     *
-     * @param type  Remove from
-     * @param value Value to remove
-     */
-    protected void logRemoving(String type, String value) {
-        LOG.trace("Removing '{}' from '{}'", value, type);
-    }
-
-    /**
-     * Logs to trace: "Clearing 'type'
-     *
-     * @param type Type to clear
-     */
-    protected void logClearing(String type) {
-        LOG.trace("Clearing '{}'", type);
-    }
-
-
     @Override
     public void addProcedureDescriptionFormatsForProcedure(String procedure, Set<String> formats) {
         this.procedureProcedureDescriptionFormats.computeIfAbsent(procedure, createSynchronizedSet())
@@ -2652,199 +2661,163 @@ public class InMemoryCacheImpl extends AbstractStaticSosContentCache implements 
         return procedureProcedureDescriptionFormats.get(procedure);
     }
 
-
-    @Override
-    public Set<String> getPublishedFeatureOfInterest() {
-        return copyOf(publishedFeatureOfInterest);
-    }
-
-    @Override
-    public Set<String> getPublishedProcedures() {
-        return copyOf(publishedProcedure);
-    }
-
-    @Override
-    public Set<String> getPublishedOfferings() {
-        return copyOf(publishedOffering);
-    }
-
-    @Override
-    public Set<String> getPublishedObservableProperties() {
-        return copyOf(publishedObservableProperty);
-    }
-
-
-    @Override
-    public void addPublishedFeatureOfInterest(String featureOfInterest) {
-        notNullOrEmpty(PUBLISHED_FEATURE_OF_INTEREST, featureOfInterest);
-        LOG.trace("Adding published FeatureOfInterest {}", featureOfInterest);
-        publishedFeatureOfInterest.add(featureOfInterest);
-    }
-
-    @Override
-    public void addPublishedFeaturesOfInterest(Collection<String> featuresOfInterest) {
-        noNullValues(PUBLISHED_FEATURES_OF_INTEREST, featuresOfInterest);
-        for (final String featureOfInterest : featuresOfInterest) {
-            addPublishedFeatureOfInterest(featureOfInterest);
-        }
-    }
-
-    @Override
-    public void setPublishedFeaturesOfInterest(final Collection<String> featuresOfInterest) {
-        LOG.trace("Setting published FeaturesOfInterest");
-        clearPublishedFeaturesOfInterest();
-        addPublishedFeaturesOfInterest(featuresOfInterest);
-    }
-
-    @Override
-    public void clearPublishedFeaturesOfInterest() {
-        LOG.trace("Clearing published features of interest");
-        publishedFeatureOfInterest.clear();
-    }
-
-    @Override
-    public void removePublishedFeatureOfInterest(final String featureOfInterest) {
-        notNullOrEmpty(PUBLISHED_FEATURE_OF_INTEREST, featureOfInterest);
-        LOG.trace("Removing published FeatureOfInterest {}", featureOfInterest);
-        publishedFeatureOfInterest.remove(featureOfInterest);
-    }
-
-    @Override
-    public void removePublishedFeaturesOfInterest(final Collection<String> featuresOfInterest) {
-        noNullValues(PUBLISHED_FEATURES_OF_INTEREST, featuresOfInterest);
-        for (final String featureOfInterest : featuresOfInterest) {
-            removePublishedFeatureOfInterest(featureOfInterest);
-        }
-    }
-
    @Override
-   public void addPublishedProcedure(String procedure) {
+   public void addTransactionalProcedure(String procedure) {
        notNullOrEmpty(PUBLISHED_PROCEDURE, procedure);
-       LOG.trace("Adding published procedure {}", procedure);
-       publishedProcedure.add(procedure);
+       LOG.trace("Adding transactional procedure {}", procedure);
+       transactionalProcedures.add(procedure);
    }
 
    @Override
-   public void addPublishedProcedures(Collection<String> procedures) {
+   public void addTransactionalProcedures(Collection<String> procedures) {
        noNullValues(PUBLISHED_PROCEDURES, procedures);
        for (final String procedure : procedures) {
-           addPublishedProcedure(procedure);
+           addTransactionalProcedure(procedure);
        }
    }
 
    @Override
-   public void setPublishedProcedures(final Collection<String> procedures) {
-       LOG.trace("Setting published procedure");
-       clearPublishedProcedure();
-       addPublishedProcedures(procedures);
+   public void setTransactionalProcedures(final Collection<String> procedures) {
+       LOG.trace("Setting transactional procedure");
+       clearTransactionalProcedure();
+       addTransactionalProcedures(procedures);
    }
 
    @Override
-   public void clearPublishedProcedure() {
-       LOG.trace("Clearing published procedure");
-       publishedProcedure.clear();
+   public void clearTransactionalProcedure() {
+       LOG.trace("Clearing transactional procedure");
+       transactionalProcedures.clear();
    }
 
    @Override
-   public void removePublishedProcedure(final String procedure) {
+   public void removeTransactionalProcedure(final String procedure) {
        notNullOrEmpty(PUBLISHED_PROCEDURE, procedure);
-       LOG.trace("Removing published procedure {}", procedure);
-       publishedProcedure.remove(procedure);
+       LOG.trace("Removing transactional procedure {}", procedure);
+       transactionalProcedures.remove(procedure);
    }
 
    @Override
-   public void removePublishedProcedures(final Collection<String> procedures) {
+   public void removeTransactionalProcedures(final Collection<String> procedures) {
        noNullValues(PUBLISHED_PROCEDURES, procedures);
        for (final String procedure : procedures) {
-           removePublishedProcedure(procedure);
+           removeTransactionalProcedure(procedure);
        }
    }
 
    @Override
-   public void addPublishedOffering(String offering) {
+   public void addTransactionalOffering(String offering) {
        notNullOrEmpty(PUBLISHED_OFFERING, offering);
-       LOG.trace("Adding published offering {}", offering);
-       publishedOffering.add(offering);
+       LOG.trace("Adding transactional offering {}", offering);
+       transactionalOfferings.add(offering);
    }
 
    @Override
-   public void addPublishedOfferings(Collection<String> offerings) {
+   public void addTransactionalOfferings(Collection<String> offerings) {
        noNullValues(PUBLISHED_OFFERINGS, offerings);
        for (final String offering : offerings) {
-           addPublishedOffering(offering);
+           addTransactionalOffering(offering);
        }
    }
 
    @Override
-   public void setPublishedOfferings(final Collection<String> offerings) {
-       LOG.trace("Setting published offering");
-       clearPublishedOffering();
-       addPublishedOfferings(offerings);
+   public void setTransactionalOfferings(final Collection<String> offerings) {
+       LOG.trace("Setting transactional offering");
+       clearTransactionalOffering();
+       addTransactionalOfferings(offerings);
    }
 
    @Override
-   public void clearPublishedOffering() {
-       LOG.trace("Clearing published offering");
-       publishedOffering.clear();
+   public void clearTransactionalOffering() {
+       LOG.trace("Clearing transactional offering");
+       transactionalOfferings.clear();
    }
 
    @Override
-   public void removePublishedOffering(final String offering) {
+   public void removeTransactionalOffering(final String offering) {
        notNullOrEmpty(PUBLISHED_OFFERING, offering);
-       LOG.trace("Removing published offering {}", offering);
-       publishedOffering.remove(offering);
+       LOG.trace("Removing transactional offering {}", offering);
+       transactionalOfferings.remove(offering);
    }
 
    @Override
-   public void removePublishedOfferings(final Collection<String> offerings) {
+   public void removeTransactionalOfferings(final Collection<String> offerings) {
        noNullValues(PUBLISHED_OFFERINGS, offerings);
        for (final String offering : offerings) {
-           removePublishedOffering(offering);
+           removeTransactionalOffering(offering);
        }
    }
 
    @Override
-   public void addPublishedObservableProperty(String observableProperty) {
+   public void addTransactionalObservableProperty(String observableProperty) {
        notNullOrEmpty(PUBLISHED_OBSERVABLE_PROPERTY, observableProperty);
-       LOG.trace("Adding published observableProperty {}", observableProperty);
-       publishedObservableProperty.add(observableProperty);
+       LOG.trace("Adding transactional observableProperty {}", observableProperty);
+       transactionalObservableProperties.add(observableProperty);
    }
 
    @Override
-   public void addPublishedObservableProperties(Collection<String> observableProperties) {
+   public void addTransactionalObservableProperties(Collection<String> observableProperties) {
        noNullValues(PUBLISHED_OBSERVABLE_PROPERTIES, observableProperties);
        for (final String observableProperty : observableProperties) {
-           addPublishedObservableProperty(observableProperty);
+           addTransactionalObservableProperty(observableProperty);
        }
    }
 
    @Override
-   public void setPublishedObservableProperties(final Collection<String> observableProperties) {
-       LOG.trace("Setting published observableProperties");
-       clearPublishedFeaturesOfInterest();
-       addPublishedObservableProperties(observableProperties);
+   public void setTransactionalObservableProperties(final Collection<String> observableProperties) {
+       LOG.trace("Setting transactional observableProperties");
+       clearTransactionalObservableProperty();
+       addTransactionalObservableProperties(observableProperties);
    }
 
    @Override
-   public void clearPublishedObservableProperty() {
-       LOG.trace("Clearing published observableProperties");
-       publishedObservableProperty.clear();
+   public void clearTransactionalObservableProperty() {
+       LOG.trace("Clearing transactional observableProperties");
+       transactionalObservableProperties.clear();
    }
 
    @Override
-   public void removePublishedObservableProperty(final String observableProperty) {
+   public void removeTransactionalObservableProperty(final String observableProperty) {
        notNullOrEmpty(PUBLISHED_OBSERVABLE_PROPERTY, observableProperty);
-       LOG.trace("Removing published observableProperty {}", observableProperty);
-       publishedObservableProperty.remove(observableProperty);
+       LOG.trace("Removing transactional observableProperty {}", observableProperty);
+       transactionalObservableProperties.remove(observableProperty);
    }
 
    @Override
-   public void removePublishedObservableProperties(final Collection<String> observableProperties) {
+   public void removeTransactionalObservableProperties(final Collection<String> observableProperties) {
        noNullValues(PUBLISHED_OBSERVABLE_PROPERTIES, observableProperties);
        for (final String observableProperty : observableProperties) {
-           removePublishedObservableProperty(observableProperty);
+           removeTransactionalObservableProperty(observableProperty);
        }
    }
+
+    /**
+ * Logs to trace: "Adding 'value' to 'type'".
+ *
+ * @param type  Add to
+ * @param value Value to add
+ */
+protected void logAdding(String type, String value) {
+    LOG.trace("Adding '{}' to '{}'", value, type);
+}
+
+/**
+ * Logs to trace: "Removing 'value' from 'type'".
+ *
+ * @param type  Remove from
+ * @param value Value to remove
+ */
+protected void logRemoving(String type, String value) {
+    LOG.trace("Removing '{}' from '{}'", value, type);
+}
+
+/**
+ * Logs to trace: "Clearing 'type'
+ *
+ * @param type Type to clear
+ */
+protected void logClearing(String type) {
+    LOG.trace("Clearing '{}'", type);
+}
 
     @Override
     public int hashCode() {
@@ -3096,6 +3069,24 @@ public class InMemoryCacheImpl extends AbstractStaticSosContentCache implements 
             return false;
         }
         if (!Objects.equals(this.updateTime, other.updateTime)) {
+            return false;
+        }
+        if (!Objects.equals(this.procedureProcedureDescriptionFormats, other.procedureProcedureDescriptionFormats)) {
+            return false;
+        }
+        if (!Objects.equals(this.transactionalProcedures, other.transactionalProcedures)) {
+            return false;
+        }
+        if (!Objects.equals(this.transactionalOfferings, other.transactionalOfferings)) {
+            return false;
+        }
+        if (!Objects.equals(this.transactionalObservableProperties, other.transactionalObservableProperties)) {
+            return false;
+        }
+        if (!Objects.equals(this.allowQueryingForInstancesOnly, other.allowQueryingForInstancesOnly)) {
+            return false;
+        }
+        if (!Objects.equals(this.showOnlyAggregatedProcedures, other.showOnlyAggregatedProcedures)) {
             return false;
         }
         return true;

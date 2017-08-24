@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.Session;
 import org.n52.iceland.exception.ows.concrete.GenericThrowableWrapperException;
@@ -44,6 +45,7 @@ import org.n52.janmayen.i18n.LocalizedString;
 import org.n52.janmayen.i18n.MultilingualString;
 import org.n52.series.db.beans.DatasetEntity;
 import org.n52.series.db.beans.OfferingEntity;
+import org.n52.series.db.beans.TypeEntity;
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.shetland.util.CollectionHelper;
 import org.n52.shetland.util.DateTimeHelper;
@@ -66,7 +68,6 @@ public class OfferingCacheUpdateTask extends AbstractThreadableDatasourceCacheUp
 
 //    private final FeatureOfInterestDAO featureDAO = new FeatureOfInterestDAO();
     private final String identifier;
-    @SuppressWarnings("rawtypes")
     private final Collection<DatasetEntity> datasets;
     private final OfferingEntity offering;
     private final Locale defaultLanguage;
@@ -104,7 +105,8 @@ public class OfferingCacheUpdateTask extends AbstractThreadableDatasourceCacheUp
         // since they are performed once per offering
 
         getCache().addOffering(identifier);
-        getCache().addPublishedOffering(identifier);
+        checkForTransactional();
+        getCache().addTransactionalOffering(identifier);
         addOfferingNamesAndDescriptionsToCache(identifier, session);
         // only check once, check flag in other methods
         // Procedures
@@ -119,11 +121,11 @@ public class OfferingCacheUpdateTask extends AbstractThreadableDatasourceCacheUp
         getCache().setObservablePropertiesForOffering(identifier, getObservablePropertyIdentifier(session));
 
         // Observation types
-        getCache().setObservationTypesForOffering(identifier, offering.getObservationTypes());
+        getCache().setObservationTypesForOffering(identifier, getTypes(offering.getObservationTypes()));
 
         // Features of Interest
         getCache().setFeaturesOfInterestForOffering(identifier, DatasourceCacheUpdateHelper.getAllFeatureIdentifiersFromDatasets(datasets));
-        getCache().setFeatureOfInterestTypesForOffering(identifier, offering.getFeatureTypes());
+        getCache().setFeatureOfInterestTypesForOffering(identifier,  getTypes(offering.getFeatureTypes()));
 
         // Spatial Envelope
         getCache().setEnvelopeForOffering(identifier, getEnvelopeForOffering(offering));
@@ -133,6 +135,16 @@ public class OfferingCacheUpdateTask extends AbstractThreadableDatasourceCacheUp
         getCache().setMaxPhenomenonTimeForOffering(identifier, DateTimeHelper.makeDateTime(offering.getPhenomenonTimeEnd()));
         getCache().setMinResultTimeForOffering(identifier, DateTimeHelper.makeDateTime(offering.getResultTimeStart()));
         getCache().setMaxResultTimeForOffering(identifier,DateTimeHelper.makeDateTime(offering.getResultTimeEnd()));
+    }
+
+    private void checkForTransactional() {
+        if (datasets.stream().anyMatch(d -> !d.getObservationConstellation().isDisabled())) {
+            getCache().addTransactionalOffering(identifier);
+        }
+    }
+
+    private Collection<String> getTypes(Set<? extends TypeEntity<?>> observationTypes) {
+       return observationTypes.stream().map(o -> o.getType()).collect(Collectors.toSet());
     }
 
     protected void addOfferingNamesAndDescriptionsToCache(String identifier, Session session)
@@ -232,17 +244,17 @@ public class OfferingCacheUpdateTask extends AbstractThreadableDatasourceCacheUp
     }
 
     protected ReferencedEnvelope getEnvelopeForOffering(OfferingEntity offering) throws OwsExceptionReport {
-        if (offering.hasEnvelope()) {
-            return new ReferencedEnvelope(offering.getEnvelope().getEnvelopeInternal(), offering.getEnvelope().getSRID());
+        if (offering.isSetGeometry()) {
+            return new ReferencedEnvelope(offering.getGeometry().getEnvelopeInternal(), offering.getGeometry().getSRID());
         } else if (datasets != null && !datasets.isEmpty()) {
             Envelope e = new Envelope();
             int srid = -1;
             for (DatasetEntity de : datasets) {
                 if (de.getFeature().isSetGeometry()) {
                     if (srid < 0 ) {
-                        srid = de.getFeature().getGeometry().getSRID();
+                        srid = de.getFeature().getGeometryEntity().getSrid();
                     }
-                    e.expandToInclude(de.getFeature().getGeometry().getEnvelopeInternal());
+                    e.expandToInclude(de.getFeature().getGeometryEntity().getGeometry().getEnvelopeInternal());
                 }
             }
             return new ReferencedEnvelope(e, srid);

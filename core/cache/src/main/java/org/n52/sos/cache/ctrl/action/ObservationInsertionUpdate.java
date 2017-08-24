@@ -114,8 +114,6 @@ public class ObservationInsertionUpdate extends InMemoryCacheUpdate {
                 String featureOfInterest = sosSamplingFeature.getIdentifierCodeWithAuthority().getValue();
 
                 cache.addFeatureOfInterest(featureOfInterest);
-                cache.addPublishedFeatureOfInterest(featureOfInterest);
-                cache.addPublishedFeatureOfInterest(featureOfInterest);
                 if (sosSamplingFeature.isSetName()) {
                     cache.addFeatureOfInterestIdentifierHumanReadableName(featureOfInterest, sosSamplingFeature.getFirstName().getValue());
                 }
@@ -124,7 +122,7 @@ public class ObservationInsertionUpdate extends InMemoryCacheUpdate {
                     for (AbstractFeature parentFeature : sosSamplingFeature.getSampledFeatures()) {
                         cache.addParentFeature(sosSamplingFeature.getIdentifierCodeWithAuthority().getValue(),
                                 parentFeature.getIdentifierCodeWithAuthority().getValue());
-                        cache.addPublishedFeatureOfInterest(parentFeature.getIdentifierCodeWithAuthority().getValue());
+                        cache.addFeatureOfInterest(parentFeature.getIdentifierCodeWithAuthority().getValue());
                     }
                 }
                 for (String offering : request.getOfferings()) {
