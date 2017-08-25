@@ -26,36 +26,12 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
  */
-package org.n52.sos.ds.hibernate.util;
+package org.n52.sw.suite.db.util;
 
-import com.google.common.base.Strings;
+import org.hibernate.transform.BasicTransformerAdapter;
 
-/**
- * Hold min and max obs time for offering
- *
- * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
- * @since 4.4.0
- *
- */
-public class OfferingTimeExtrema extends TimeExtrema {
-    private String offering;
-
-    /**
-     * @return the offering
-     */
-    public String getOffering() {
-        return offering;
-    }
-
-    /**
-     * @param offering
-     *            the offering to set
-     */
-    public void setOffering(String offering) {
-        this.offering = offering;
-    }
-
-    public boolean isSetOffering() {
-        return !Strings.isNullOrEmpty(getOffering());
-    }
+public class NoopTransformerAdapter extends BasicTransformerAdapter {
+    private static final long serialVersionUID = -6236027454442644513L;
+    public static final NoopTransformerAdapter INSTANCE = new NoopTransformerAdapter();
+    private NoopTransformerAdapter() {}
 }

@@ -46,11 +46,11 @@ import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.ProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.TProcedure;
 import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
-import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.exception.ows.concrete.UnsupportedOperatorException;
 import org.n52.sos.exception.ows.concrete.UnsupportedTimeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedValueReferenceException;
+import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.suite.db.util.QueryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,12 +226,12 @@ public class ValidProcedureTimeDAO {
         LOGGER.debug("QUERY getTProcedureFormatMap(): {}", HibernateHelper.getSqlString(criteria));
         @SuppressWarnings("unchecked")
         List<Object[]> results = criteria.list();
-        Map<String,String> tProcedureFormatMap = Maps.newTreeMap();
+        Map<String,String> procedureFormatMap = Maps.newTreeMap();
         for (Object[] result : results) {
             String procedureIdentifier = (String) result[0];
             String format = (String) result[1];
-            tProcedureFormatMap.put(procedureIdentifier, format);
+            procedureFormatMap.put(procedureIdentifier, format);
         }
-        return tProcedureFormatMap;
+        return procedureFormatMap;
     }
 }

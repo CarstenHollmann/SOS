@@ -26,59 +26,36 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
  */
-package org.n52.sos.ds.hibernate.util;
+package org.n52.sw.suite.db.util;
 
-import org.joda.time.DateTime;
-import org.n52.shetland.ogc.gml.time.Time;
-import org.n52.shetland.ogc.gml.time.TimeInstant;
-import org.n52.shetland.ogc.gml.time.TimePeriod;
+import com.google.common.base.Strings;
 
 /**
- * Holder for observation time extrema. Contains phenomenon, result and valid
- * time.
+ * Hold min and max obs time for procedure
  *
  * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
- * @since 4.3.0
+ * @since 4.0.0
  *
  */
-public class ObservationTimeExtrema extends TimeExtrema {
+public class ProcedureTimeExtrema extends TimeExtrema {
+    private String procedure;
 
-    private DateTime minValidTime;
-
-    private DateTime maxValidTime;
-
-    public DateTime getMinValidTime() {
-        return minValidTime;
+    /**
+     * @return the procedure
+     */
+    public String getProcedure() {
+        return procedure;
     }
 
-    public void setMinValidTime(DateTime minValidTime) {
-        this.minValidTime = minValidTime;
+    /**
+     * @param procedure
+     *            the procedure to set
+     */
+    public void setProcedure(String procedure) {
+        this.procedure = procedure;
     }
 
-    public DateTime getMaxValidTime() {
-        return maxValidTime;
+    public boolean isSetProcedure() {
+        return !Strings.isNullOrEmpty(getProcedure());
     }
-
-    public void setMaxValidTime(DateTime maxValidTime) {
-        this.maxValidTime = maxValidTime;
-    }
-
-    public Time getValidTime() {
-        if (isSetValidTime()) {
-            if (getMinValidTime().equals(getMaxValidTime())) {
-                return new TimeInstant(getMaxValidTime());
-            }
-            return new TimePeriod(getMinValidTime(), getMaxValidTime());
-        }
-        return null;
-    }
-
-    public boolean isSetValidTime() {
-        return getMinValidTime() != null && getMaxValidTime() != null;
-    }
-
-    public boolean isEmpty() {
-        return !isSetPhenomenonTimes() && !isSetResultTimes() && !isSetValidTime();
-    }
-
 }

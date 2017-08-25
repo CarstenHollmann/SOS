@@ -51,8 +51,8 @@ import org.n52.sos.ds.HibernateDatasourceConstants;
 import org.n52.sos.ds.hibernate.type.ConfigurableTimestampType;
 import org.n52.sos.ds.hibernate.type.IsoTimeStringType;
 import org.n52.sos.ds.hibernate.type.UtcTimestampType;
-import org.n52.sos.ds.hibernate.util.HibernateMetadataCache;
 import org.n52.sos.service.DriverCleanupListener;
+import org.n52.sw.suite.db.util.HibernateMetadataCache;
 
 public abstract class UnspecifiedSessionFactoryProvider
         extends AbstractSessionFactoryProvider

@@ -40,9 +40,9 @@ import org.n52.sos.ds.hibernate.dao.DaoFactory;
 import org.n52.sos.ds.hibernate.dao.observation.series.AbstractSeriesValueDAO;
 import org.n52.sos.ds.hibernate.dao.observation.series.AbstractSeriesValueTimeDAO;
 import org.n52.sos.ds.hibernate.entities.observation.legacy.AbstractValuedLegacyObservation;
-import org.n52.sos.ds.hibernate.util.ObservationTimeExtrema;
 import org.n52.sos.ds.hibernate.values.AbstractHibernateStreamingValue;
 import org.n52.svalbard.util.GmlHelper;
+import org.n52.sw.suite.db.util.ObservationTimeExtrema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

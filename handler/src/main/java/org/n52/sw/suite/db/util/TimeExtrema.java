@@ -26,7 +26,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
  */
-package org.n52.sos.ds.hibernate.util;
+package org.n52.sw.suite.db.util;
 
 import org.joda.time.DateTime;
 import org.n52.shetland.ogc.gml.time.Time;

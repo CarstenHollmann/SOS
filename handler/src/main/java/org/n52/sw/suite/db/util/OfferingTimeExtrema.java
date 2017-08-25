@@ -26,36 +26,36 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
  */
-package org.n52.sos.ds.hibernate.util;
+package org.n52.sw.suite.db.util;
 
 import com.google.common.base.Strings;
 
 /**
- * Hold min and max obs time for procedure
+ * Hold min and max obs time for offering
  *
  * @author <a href="mailto:c.hollmann@52north.org">Carsten Hollmann</a>
- * @since 4.0.0
+ * @since 4.4.0
  *
  */
-public class ProcedureTimeExtrema extends TimeExtrema {
-    private String procedure;
+public class OfferingTimeExtrema extends TimeExtrema {
+    private String offering;
 
     /**
-     * @return the procedure
+     * @return the offering
      */
-    public String getProcedure() {
-        return procedure;
+    public String getOffering() {
+        return offering;
     }
 
     /**
-     * @param procedure
-     *            the procedure to set
+     * @param offering
+     *            the offering to set
      */
-    public void setProcedure(String procedure) {
-        this.procedure = procedure;
+    public void setOffering(String offering) {
+        this.offering = offering;
     }
 
-    public boolean isSetProcedure() {
-        return !Strings.isNullOrEmpty(getProcedure());
+    public boolean isSetOffering() {
+        return !Strings.isNullOrEmpty(getOffering());
     }
 }

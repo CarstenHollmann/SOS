@@ -68,7 +68,7 @@ public class FeatureOfInterestCacheUpdate extends AbstractThreadableDatasourceCa
             ProcedureDao procedureDao = new ProcedureDao(getSession());
             for (FeatureEntity featureEntity : features) {
                 String identifier = featureEntity.getDomainId();
-                getCache().addPublishedFeatureOfInterest(identifier);
+                getCache().addFeatureOfInterest(identifier);
                 getCache().addFeatureOfInterest(identifier);
                 if (featureEntity.isSetName()) {
                         getCache().addFeatureOfInterestIdentifierHumanReadableName(identifier, featureEntity.getName());

@@ -26,31 +26,13 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
  */
-package org.n52.sos.ds.hibernate.entities;
+package org.n52.sw.suite.db.util;
 
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.AbstractEReportingObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.AbstractValuedEReportingObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.ContextualReferencedEReportingObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.EReportingSeries;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.TemporalReferencedEReportingObservation;
-import org.n52.sos.ds.hibernate.entities.observation.series.AbstractSeriesObservation;
-import org.n52.sos.ds.hibernate.entities.observation.series.AbstractValuedSeriesObservation;
-import org.n52.sos.ds.hibernate.entities.observation.series.ContextualReferencedSeriesObservation;
-import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sos.ds.hibernate.entities.observation.series.TemporalReferencedSeriesObservation;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
+import org.n52.series.db.beans.DataEntity;
+import org.n52.series.db.beans.DatasetEntity;
+import org.n52.series.db.beans.ereporting.EReportingDataEntity;
 
 public class EntitiyHelper {
-
-    /**
-     * Get the EntitiyHelper instance
-     *
-     * @return Returns the instance of the EntitiyHelper.
-     */
-    @Deprecated
-    public static synchronized EntitiyHelper getInstance() {
-        return new EntitiyHelper();
-    }
 
     public boolean isSeriesSupported() {
         return getSeriesEntityClass() != null;
@@ -90,10 +72,10 @@ public class EntitiyHelper {
     }
 
     public Class<?> getSeriesEntityClass() {
-        if (HibernateHelper.isEntitySupported(EReportingSeries.class)) {
-            return EReportingSeries.class;
-        } else if (HibernateHelper.isEntitySupported(Series.class)) {
-            return Series.class;
+        if (HibernateHelper.isEntitySupported(EReportingDataEntity.class)) {
+            return EReportingDataEntity.class;
+        } else if (HibernateHelper.isEntitySupported(DatasetEntity.class)) {
+            return DatasetEntity.class;
         }
         return null;
     }

@@ -38,7 +38,7 @@ import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.shetland.ogc.sos.request.GetObservationRequest;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 import org.n52.sos.ds.hibernate.entities.observation.series.TemporalReferencedSeriesObservation;
-import org.n52.sos.ds.hibernate.util.ObservationTimeExtrema;
+import org.n52.sw.suite.db.util.ObservationTimeExtrema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

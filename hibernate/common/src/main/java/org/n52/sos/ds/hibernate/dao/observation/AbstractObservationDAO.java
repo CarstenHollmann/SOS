@@ -144,14 +144,14 @@ import org.n52.sos.ds.hibernate.entities.observation.full.TextObservation;
 import org.n52.sos.ds.hibernate.entities.parameter.observation.Parameter;
 import org.n52.sos.ds.hibernate.entities.parameter.observation.ParameterFactory;
 import org.n52.sos.ds.hibernate.util.HibernateConstants;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
 import org.n52.sos.ds.hibernate.util.ObservationSettingProvider;
 import org.n52.sos.ds.hibernate.util.ScrollableIterable;
 import org.n52.sos.ds.hibernate.util.SosTemporalRestrictions;
 import org.n52.sos.ds.hibernate.util.SpatialRestrictions;
-import org.n52.sos.ds.hibernate.util.TimeExtrema;
 import org.n52.sos.ds.hibernate.util.observation.HibernateObservationUtilities;
 import org.n52.sos.util.GeometryHandler;
+import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.suite.db.util.TimeExtrema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

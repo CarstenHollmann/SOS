@@ -44,7 +44,7 @@ import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;
 import org.n52.sos.ds.hibernate.dao.metadata.SeriesMetadataDAO;
 import org.n52.sos.ds.hibernate.entities.metadata.SeriesMetadata;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
+import org.n52.sw.suite.db.util.HibernateHelper;
 
 import com.google.common.base.Optional;
 

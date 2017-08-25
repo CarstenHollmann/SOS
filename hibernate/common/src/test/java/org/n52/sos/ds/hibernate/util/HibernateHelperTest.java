@@ -33,6 +33,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Test;
+import org.n52.sw.suite.db.util.HibernateHelper;
 
 import com.google.common.collect.Lists;
 

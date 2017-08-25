@@ -26,7 +26,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
  */
-package org.n52.sos.ds.hibernate.util;
+package org.n52.sw.suite.db.util;
 
 import java.util.Collection;
 import java.util.List;
@@ -60,6 +60,9 @@ import com.google.common.collect.Maps;
  *
  */
 public final class HibernateHelper {
+    
+    private static final int LIMIT_EXPRESSION_DEPTH = 1000;
+    
     /**
      * Private constructor
      */
@@ -156,16 +159,16 @@ public final class HibernateHelper {
     public static List<List<Long>> getValidSizedLists(Collection<Long> queryIds) {
         List<Long> queryIdsList = Lists.newArrayList(queryIds);
         List<List<Long>> lists = Lists.newArrayList();
-        if (queryIds.size() > HibernateConstants.LIMIT_EXPRESSION_DEPTH) {
+        if (queryIds.size() > LIMIT_EXPRESSION_DEPTH) {
             int startIndex = 0;
-            int endIndex = HibernateConstants.LIMIT_EXPRESSION_DEPTH - 1;
+            int endIndex = LIMIT_EXPRESSION_DEPTH - 1;
             while (startIndex < queryIdsList.size() - 1) {
                 if (endIndex > (queryIdsList.size())) {
                     endIndex = (queryIdsList.size());
                 }
                 lists.add(queryIdsList.subList(startIndex, endIndex));
                 startIndex = endIndex;
-                endIndex = endIndex + HibernateConstants.LIMIT_EXPRESSION_DEPTH - 1;
+                endIndex = endIndex + LIMIT_EXPRESSION_DEPTH - 1;
             }
         } else {
             lists.add(queryIdsList);

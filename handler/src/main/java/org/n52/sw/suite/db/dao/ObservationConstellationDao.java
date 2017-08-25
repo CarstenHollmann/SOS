@@ -30,11 +30,9 @@ package org.n52.sw.suite.db.dao;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.hibernate.Criteria;
@@ -44,9 +42,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
-import org.n52.series.db.DataAccessException;
 import org.n52.series.db.DataModelUtil;
-import org.n52.series.db.beans.DataEntity;
 import org.n52.series.db.beans.DatasetEntity;
 import org.n52.series.db.beans.DescribableEntity;
 import org.n52.series.db.beans.ObservationConstellationEntity;
@@ -54,12 +50,7 @@ import org.n52.series.db.beans.ObservationTypeEntity;
 import org.n52.series.db.beans.OfferingEntity;
 import org.n52.series.db.beans.PhenomenonEntity;
 import org.n52.series.db.beans.ProcedureEntity;
-import org.n52.series.db.beans.dataset.Dataset;
-import org.n52.series.db.dao.AbstractDao;
-import org.n52.series.db.dao.DbQuery;
-import org.n52.series.db.dao.OfferingDao;
 import org.n52.series.db.dao.PhenomenonDao;
-import org.n52.series.db.dao.ProcedureDao;
 import org.n52.shetland.ogc.om.AbstractPhenomenon;
 import org.n52.shetland.ogc.om.OmCompositePhenomenon;
 import org.n52.shetland.ogc.om.OmObservableProperty;
@@ -76,18 +67,12 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class ObservationConstellationDao {
+public class ObservationConstellationDao extends AbstractDao {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ObservationConstellationDao.class);
 
-    private final Session session;
-
-    public ObservationConstellationDao(Session session) {
-        this.session = session;
-    }
-
-    protected Session getSession() {
-        return session;
+    public ObservationConstellationDao(DaoFactory daoFactory, Session session) {
+        super(daoFactory, session);
     }
 
     /**
@@ -98,7 +83,7 @@ public class ObservationConstellationDao {
      * @return Observation constellation objects
      */
     @SuppressWarnings("unchecked")
-    public List<ObservationConstellationEntity> get(Session session) {
+    public List<ObservationConstellationEntity> get() {
         Criteria criteria = getNotDeletedCriteria();
         LOGGER.debug("QUERY getObservationConstellations(): {}", DataModelUtil.getSqlString(criteria));
         return criteria.list();
@@ -214,7 +199,7 @@ public class ObservationConstellationDao {
      * @return ObservationConstellations
      */
     @SuppressWarnings("unchecked")
-    public List<ObservationConstellationEntity> get(String procedure, String observableProperty, Session session) {
+    public List<ObservationConstellationEntity> get(String procedure, String observableProperty) {
         Criteria criteria = getNotDeletedCriteria();
         addOnIdentifier(criteria, ObservationConstellationEntity.PROCEDURE, procedure);
         addOnIdentifier(criteria, ObservationConstellationEntity.OBSERVABLE_PROPERTY, observableProperty);
@@ -293,7 +278,7 @@ public class ObservationConstellationDao {
      *            Hibernate session
      * @return Observation constellation info objects
      */
-    public List<ObservationConstellationInfo> getObservationConstellationInfo(Session session) {
+    public List<ObservationConstellationInfo> getObservationConstellationInfo() {
         List<ObservationConstellationInfo> ocis = Lists.newArrayList();
         Criteria criteria = getNotDeletedAndPublishedCriteria("oc")
                 .createAlias(ObservationConstellationEntity.OFFERING, "o")
@@ -403,7 +388,7 @@ public class ObservationConstellationDao {
      * @throws OwsExceptionReport
      *             If the requested observation type is invalid
      */
-    public ObservationConstellationEntity check(OmObservationConstellation sosOC, String offering, Session session,
+    public ObservationConstellationEntity check(OmObservationConstellation sosOC, String offering,
             String parameterName)
             throws OwsExceptionReport {
         AbstractPhenomenon observableProperty = sosOC.getObservableProperty();
@@ -447,9 +432,9 @@ public class ObservationConstellationDao {
             // add parent/childs
             if (observableProperty instanceof OmCompositePhenomenon) {
                 OmCompositePhenomenon omCompositePhenomenon = (OmCompositePhenomenon) observableProperty;
-                PhenomenonDao dao = new PhenomenonDao(getSession());
+                PhenomenonDao dao = getDaoFactory().getObservablePropertyDao(getSession());
                 Map<String, PhenomenonEntity> obsprop =
-                        dao.getOrInsertAsMap(Arrays.asList(observableProperty), false, session);
+                        dao.getOrInsertAsMap(Arrays.asList(observableProperty), false);
                 for (OmObservableProperty child : omCompositePhenomenon) {
                     checkOrInsert(hoc.getProcedure(), obsprop.get(child.getIdentifier()),
                             hoc.getOffering(), true);

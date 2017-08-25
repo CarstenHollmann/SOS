@@ -65,7 +65,6 @@ import org.n52.sos.ds.hibernate.entities.observation.Observation;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 import org.n52.sos.ds.hibernate.entities.observation.series.SeriesObservation;
 import org.n52.sos.ds.hibernate.util.HibernateGetObservationHelper;
-import org.n52.sos.ds.hibernate.util.ObservationTimeExtrema;
 import org.n52.sos.ds.hibernate.util.observation.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.observation.OmObservationCreatorContext;
 import org.n52.sos.ds.hibernate.values.series.HibernateChunkSeriesStreamingValue;
@@ -75,6 +74,7 @@ import org.n52.svalbard.encode.Encoder;
 import org.n52.svalbard.encode.EncoderRepository;
 import org.n52.svalbard.encode.ObservationEncoder;
 import org.n52.svalbard.encode.XmlEncoderKey;
+import org.n52.sw.suite.db.util.ObservationTimeExtrema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

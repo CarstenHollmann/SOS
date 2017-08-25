@@ -45,10 +45,10 @@ import org.n52.shetland.ogc.sos.SosConstants;
 import org.n52.shetland.util.CollectionHelper;
 import org.n52.sos.ds.hibernate.entities.feature.AbstractFeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.feature.FeatureOfInterest;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
-import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.SpatialRestrictions;
 import org.n52.sos.util.GeometryHandler;
+import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.suite.db.util.QueryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

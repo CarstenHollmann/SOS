@@ -37,9 +37,9 @@ import org.n52.faroe.SettingsService;
 import org.n52.iceland.cache.ContentCacheController;
 import org.n52.iceland.i18n.I18NDAORepository;
 import org.n52.sos.ds.hibernate.dao.DaoFactory;
-import org.n52.sos.ds.hibernate.entities.EntitiyHelper;
 import org.n52.sos.service.profile.ProfileHandler;
 import org.n52.sos.util.GeometryHandler;
+import org.n52.sw.suite.db.util.EntitiyHelper;
 
 /**
  * Generator class for SensorML 1.0.1 procedure descriptions

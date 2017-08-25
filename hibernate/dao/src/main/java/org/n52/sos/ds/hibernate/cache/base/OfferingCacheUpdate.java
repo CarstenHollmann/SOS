@@ -51,8 +51,8 @@ import org.n52.sos.ds.hibernate.entities.ObservationType;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.RelatedFeature;
 import org.n52.sos.ds.hibernate.entities.TOffering;
-import org.n52.sos.ds.hibernate.util.OfferingTimeExtrema;
 import org.n52.sw.suite.db.util.ObservationConstellationInfo;
+import org.n52.sw.suite.db.util.OfferingTimeExtrema;
 
 import com.google.common.collect.Lists;
 

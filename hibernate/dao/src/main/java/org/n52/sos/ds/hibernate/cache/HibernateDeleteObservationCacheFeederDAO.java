@@ -44,7 +44,7 @@ import org.n52.sos.ds.hibernate.dao.DaoFactory;
 import org.n52.sos.ds.hibernate.dao.OfferingDAO;
 import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.dao.observation.AbstractObservationDAO;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
+import org.n52.sw.suite.db.util.HibernateHelper;
 
 /**
  * Updates the cache after a Observation was deleted. Uses the deleted

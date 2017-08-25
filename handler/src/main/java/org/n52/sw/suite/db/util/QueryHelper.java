@@ -26,7 +26,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
  */
-package org.n52.sos.ds.hibernate.util;
+package org.n52.sw.suite.db.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +55,8 @@ import org.n52.shetland.ogc.sos.request.SpatialFeatureQueryRequest;
 import org.n52.shetland.util.CollectionHelper;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.FeatureQueryHandlerQueryObject;
+import org.n52.sos.ds.hibernate.util.SosTemporalRestrictions;
+import org.n52.sos.ds.hibernate.util.TemporalRestrictions;
 import org.n52.sos.exception.ows.concrete.UnsupportedOperatorException;
 import org.n52.sos.exception.ows.concrete.UnsupportedTimeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedValueReferenceException;

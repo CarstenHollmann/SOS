@@ -49,9 +49,9 @@ import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 import org.n52.sos.ds.hibernate.entities.observation.series.SeriesObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.TemporalReferencedSeriesObservation;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
-import org.n52.sos.ds.hibernate.util.ObservationTimeExtrema;
-import org.n52.sos.ds.hibernate.util.QueryHelper;
+import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.suite.db.util.ObservationTimeExtrema;
+import org.n52.sw.suite.db.util.QueryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

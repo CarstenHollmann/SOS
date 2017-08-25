@@ -40,16 +40,11 @@ import org.n52.series.db.beans.ObservationTypeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ObservationTypeDao {
+public class ObservationTypeDao extends AbstractDao {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObservationTypeDao.class);
-    private final Session session;
 
-    public ObservationTypeDao(Session session) {
-        this.session = session;
-    }
-
-    protected Session geSession() {
-        return session;
+    public ObservationTypeDao(DaoFactory daoFactory, Session session) {
+        super(daoFactory, session);
     }
 
     /**
@@ -64,7 +59,7 @@ public class ObservationTypeDao {
     @SuppressWarnings("unchecked")
     public List<ObservationTypeEntity> get(List<String> observationTypes) {
         Criteria criteria =
-                geSession().createCriteria(ObservationTypeEntity.class).add(
+                getSession().createCriteria(ObservationTypeEntity.class).add(
                         Restrictions.in(ObservationTypeEntity.TYPE, observationTypes));
         LOGGER.debug("QUERY getObservationTypeObjects(observationTypes): {}", DataModelUtil.getSqlString(criteria));
         return criteria.list();
@@ -80,7 +75,7 @@ public class ObservationTypeDao {
      */
     public ObservationTypeEntity get(String observationType) {
         Criteria criteria =
-                geSession().createCriteria(ObservationTypeEntity.class).add(
+                getSession().createCriteria(ObservationTypeEntity.class).add(
                         Restrictions.eq(ObservationTypeEntity.TYPE, observationType));
         LOGGER.debug("QUERY getObservationTypeObject(observationType): {}", DataModelUtil.getSqlString(criteria));
         return (ObservationTypeEntity) criteria.uniqueResult();
@@ -100,8 +95,8 @@ public class ObservationTypeDao {
         if (hObservationType == null) {
             hObservationType = new ObservationTypeEntity();
             hObservationType.setType(observationType);
-            geSession().save(hObservationType);
-            geSession().flush();
+            getSession().save(hObservationType);
+            getSession().flush();
         }
         return hObservationType;
     }

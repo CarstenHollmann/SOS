@@ -64,8 +64,6 @@ import org.n52.sos.ds.hibernate.entities.observation.AbstractObservation;
 import org.n52.sos.ds.hibernate.entities.observation.Observation;
 import org.n52.sos.ds.hibernate.entities.observation.series.AbstractSeriesObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sos.ds.hibernate.util.HibernateHelper;
-import org.n52.sos.ds.hibernate.util.QueryHelper;
 import org.n52.sos.ds.hibernate.util.ResultHandlingHelper;
 import org.n52.sos.ds.hibernate.util.SosTemporalRestrictions;
 import org.n52.sos.ds.hibernate.util.SpatialRestrictions;
@@ -75,6 +73,8 @@ import org.n52.sos.exception.ows.concrete.UnsupportedValueReferenceException;
 import org.n52.sos.service.SosSettings;
 import org.n52.sos.util.GeometryHandler;
 import org.n52.svalbard.ConformanceClasses;
+import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.suite.db.util.QueryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
