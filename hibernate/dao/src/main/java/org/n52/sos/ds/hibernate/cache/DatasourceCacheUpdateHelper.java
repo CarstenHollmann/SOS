@@ -38,7 +38,7 @@ import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sw.suite.db.util.ObservationConstellationInfo;
+import org.n52.sw.db.util.ObservationConstellationInfo;
 
 /**
  * @since 4.0.0

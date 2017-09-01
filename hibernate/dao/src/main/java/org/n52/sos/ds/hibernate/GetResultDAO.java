@@ -89,9 +89,9 @@ import org.n52.svalbard.decode.XmlNamespaceDecoderKey;
 import org.n52.svalbard.decode.exception.DecodingException;
 import org.n52.svalbard.decode.exception.NoDecoderForKeyException;
 import org.n52.svalbard.util.XmlHelper;
-import org.n52.sw.suite.db.util.EntitiyHelper;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.QueryHelper;
+import org.n52.sw.db.util.EntitiyHelper;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.QueryHelper;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;

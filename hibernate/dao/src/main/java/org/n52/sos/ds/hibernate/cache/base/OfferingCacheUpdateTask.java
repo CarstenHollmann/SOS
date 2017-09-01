@@ -66,8 +66,8 @@ import org.n52.sos.ds.hibernate.entities.FeatureOfInterestType;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Offering;
 import org.n52.sos.ds.hibernate.entities.feature.AbstractFeatureOfInterest;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.ObservationConstellationInfo;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.ObservationConstellationInfo;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;

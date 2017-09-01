@@ -51,7 +51,7 @@ import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.sos.ds.hibernate.HibernateSessionHolder;
 import org.n52.sos.ds.hibernate.entities.AbstractIdentifierNameDescriptionEntity;
 import org.n52.sos.ds.hibernate.entities.i18n.AbstractHibernateI18NMetadata;
-import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.db.util.HibernateHelper;
 
 import com.google.common.collect.Maps;
 

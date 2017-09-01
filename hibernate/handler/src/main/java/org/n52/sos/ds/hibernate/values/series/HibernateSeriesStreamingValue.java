@@ -40,7 +40,7 @@ import org.n52.sos.ds.hibernate.dao.observation.series.AbstractSeriesValueTimeDA
 import org.n52.sos.ds.hibernate.entities.observation.AbstractValuedObservation;
 import org.n52.sos.ds.hibernate.values.AbstractHibernateStreamingValue;
 import org.n52.svalbard.util.GmlHelper;
-import org.n52.sw.suite.db.util.ObservationTimeExtrema;
+import org.n52.sw.db.util.ObservationTimeExtrema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

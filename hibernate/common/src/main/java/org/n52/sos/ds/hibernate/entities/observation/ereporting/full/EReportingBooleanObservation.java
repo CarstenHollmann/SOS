@@ -29,12 +29,12 @@
 package org.n52.sos.ds.hibernate.entities.observation.ereporting.full;
 
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
-import org.n52.sos.ds.hibernate.entities.observation.ObservationVisitor;
 import org.n52.sos.ds.hibernate.entities.observation.ValuedObservationVisitor;
 import org.n52.sos.ds.hibernate.entities.observation.VoidObservationVisitor;
 import org.n52.sos.ds.hibernate.entities.observation.VoidValuedObservationVisitor;
 import org.n52.sos.ds.hibernate.entities.observation.ereporting.AbstractEReportingObservation;
 import org.n52.sos.ds.hibernate.entities.observation.full.BooleanObservation;
+import org.n52.sw.db.beans.ObservationVisitor;
 
 public class EReportingBooleanObservation
         extends AbstractEReportingObservation<Boolean>

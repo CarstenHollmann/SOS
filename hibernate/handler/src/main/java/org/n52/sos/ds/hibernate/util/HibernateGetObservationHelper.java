@@ -44,6 +44,8 @@ import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.n52.iceland.convert.ConverterException;
+import org.n52.series.db.beans.DataEntity;
+import org.n52.series.db.beans.DatasetEntity;
 import org.n52.shetland.ogc.filter.BinaryLogicFilter;
 import org.n52.shetland.ogc.filter.ComparisonFilter;
 import org.n52.shetland.ogc.filter.Filter;
@@ -65,8 +67,6 @@ import org.n52.sos.ds.hibernate.dao.FeatureOfInterestDAO;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.observation.AbstractObservation;
 import org.n52.sos.ds.hibernate.entities.observation.Observation;
-import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sos.ds.hibernate.entities.observation.series.SeriesObservation;
 import org.n52.sos.ds.hibernate.util.observation.HibernateObservationUtilities;
 import org.n52.sos.ds.hibernate.util.observation.OmObservationCreatorContext;
 import org.n52.svalbard.encode.Encoder;
@@ -76,6 +76,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 /**
  * Helper class for GetObservation DAOs
@@ -122,11 +123,12 @@ public class HibernateGetObservationHelper {
      * @throws CodedException
      *                        If the size limit is exceeded
      */
-    public static void checkMaxNumberOfReturnedTimeSeries(Collection<? extends SeriesObservation<?>> seriesObservations,
+    public static void checkMaxNumberOfReturnedTimeSeries(Collection<? extends DataEntity<?>> seriesObservations,
                                                           int metadataObservationsCount) throws CodedException {
         if (getMaxNumberOfReturnedTimeSeriess() > 0) {
             Set<Long> seriesIds = seriesObservations.stream()
-                    .map(SeriesObservation::getSeries).map(Series::getSeriesId).collect(Collectors.toSet());
+                    .map(DataEntity::getDatasets).findAny().orElse(Sets.newHashSet())
+                    .stream().map(DatasetEntity::getId).collect(Collectors.toSet());
             checkMaxNumberOfReturnedSeriesSize(seriesIds.size() + metadataObservationsCount);
         }
     }

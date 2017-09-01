@@ -63,8 +63,6 @@ import org.n52.sos.ds.hibernate.dao.DaoFactory;
 import org.n52.sos.ds.hibernate.dao.ereporting.EReportingDaoHelper;
 import org.n52.sos.ds.hibernate.dao.ereporting.EReportingObservationContext;
 import org.n52.sos.ds.hibernate.dao.ereporting.EReportingSamplingPointDAO;
-import org.n52.sos.ds.hibernate.dao.observation.ObservationContext;
-import org.n52.sos.ds.hibernate.dao.observation.ObservationFactory;
 import org.n52.sos.ds.hibernate.dao.observation.series.AbstractSeriesDAO;
 import org.n52.sos.ds.hibernate.dao.observation.series.AbstractSeriesObservationDAO;
 import org.n52.sos.ds.hibernate.entities.ereporting.EReportingAssessmentType;
@@ -74,7 +72,9 @@ import org.n52.sos.ds.hibernate.entities.observation.ereporting.EReportingSeries
 import org.n52.sos.ds.hibernate.entities.observation.series.AbstractSeriesObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 import org.n52.sos.ds.hibernate.entities.observation.series.SeriesObservation;
-import org.n52.sw.suite.db.util.QueryHelper;
+import org.n52.sw.db.dao.ObservationContext;
+import org.n52.sw.db.dao.ObservationFactory;
+import org.n52.sw.db.util.QueryHelper;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;

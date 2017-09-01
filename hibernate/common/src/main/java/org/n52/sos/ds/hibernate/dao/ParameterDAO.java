@@ -63,7 +63,7 @@ import org.n52.shetland.ogc.sos.Sos2Constants;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasUnit;
 import org.n52.sos.ds.hibernate.entities.Unit;
 import org.n52.sos.ds.hibernate.entities.parameter.ValuedParameter;
-import org.n52.sos.ds.hibernate.entities.parameter.observation.ParameterFactory;
+import org.n52.sw.db.beans.ParameterFactory;
 
 /**
  * Hibernate DAO class to om:pramameter

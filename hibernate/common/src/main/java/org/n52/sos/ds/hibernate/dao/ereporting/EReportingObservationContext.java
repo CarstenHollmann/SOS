@@ -30,10 +30,10 @@ package org.n52.sos.ds.hibernate.dao.ereporting;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-import org.n52.sos.ds.hibernate.dao.observation.ObservationContext;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasWriteableObservationContext;
 import org.n52.sos.ds.hibernate.entities.ereporting.EReportingSamplingPoint;
 import org.n52.sos.ds.hibernate.entities.observation.ereporting.HiberanteEReportingRelations.HasEReportingSamplingPoint;
+import org.n52.sw.db.dao.ObservationContext;
 
 public class EReportingObservationContext extends ObservationContext {
     private EReportingSamplingPoint samplingPoint;

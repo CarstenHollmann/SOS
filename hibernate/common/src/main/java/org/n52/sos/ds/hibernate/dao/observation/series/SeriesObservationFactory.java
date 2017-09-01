@@ -28,7 +28,6 @@
  */
 package org.n52.sos.ds.hibernate.dao.observation.series;
 
-import org.n52.sos.ds.hibernate.dao.observation.ObservationFactory;
 import org.n52.sos.ds.hibernate.entities.observation.full.BlobObservation;
 import org.n52.sos.ds.hibernate.entities.observation.full.BooleanObservation;
 import org.n52.sos.ds.hibernate.entities.observation.full.CategoryObservation;
@@ -54,6 +53,7 @@ import org.n52.sos.ds.hibernate.entities.observation.series.full.SeriesNumericOb
 import org.n52.sos.ds.hibernate.entities.observation.series.full.SeriesProfileObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.full.SeriesSweDataArrayObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.full.SeriesTextObservation;
+import org.n52.sw.db.dao.ObservationFactory;
 
 /**
  * TODO JavaDoc

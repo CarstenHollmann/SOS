@@ -47,18 +47,19 @@ import org.n52.sos.ds.hibernate.entities.feature.AbstractFeatureOfInterest;
 import org.n52.sos.ds.hibernate.entities.feature.FeatureOfInterest;
 import org.n52.sos.ds.hibernate.util.SpatialRestrictions;
 import org.n52.sos.util.GeometryHandler;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.QueryHelper;
+import org.n52.sw.db.dao.QueryConstants;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.QueryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public abstract class AbstractFeatureOfInterestDAO extends AbstractIdentifierNameDescriptionDAO implements HibernateSqlQueryConstants {
+public abstract class AbstractFeatureOfInterestDAO extends AbstractIdentifierNameDescriptionDAO implements QueryConstants {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFeatureOfInterestDAO.class);
 
-    public abstract AbstractFeatureOfInterest insertFeature(AbstractFeature samplingFeature, Session session) throws OwsExceptionReport;
+    public abstract AbstractFeatureOfInterest insert(AbstractFeature samplingFeature, Session session) throws OwsExceptionReport;
 
     public AbstractFeatureOfInterest getFeature(String identifier, Session session) {
         Criteria criteria = getDefaultCriteria(session)
@@ -128,7 +129,7 @@ public abstract class AbstractFeatureOfInterestDAO extends AbstractIdentifierNam
         }
     }
 
-    protected AbstractFeatureOfInterest getFeatureOfInterest(final String identifier, final Geometry geometry,
+    public AbstractFeatureOfInterest getFeatureOfInterest(final String identifier, final Geometry geometry,
             final Session session) throws OwsExceptionReport {
         if (!identifier.startsWith(SosConstants.GENERATED_IDENTIFIER_PREFIX)) {
             return (FeatureOfInterest) getDefaultCriteria(session)

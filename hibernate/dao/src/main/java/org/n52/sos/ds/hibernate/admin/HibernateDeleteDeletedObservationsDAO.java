@@ -46,8 +46,8 @@ import org.n52.sos.ds.hibernate.entities.observation.AbstractObservation;
 import org.n52.sos.ds.hibernate.entities.observation.Observation;
 import org.n52.sos.ds.hibernate.entities.observation.legacy.AbstractLegacyObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.AbstractSeriesObservation;
-import org.n52.sos.ds.hibernate.util.ScrollableIterable;
-import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.ScrollableIterable;
 
 /**
  * @author <a href="mailto:c.autermann@52north.org">Christian Autermann</a>

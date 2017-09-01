@@ -34,7 +34,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sw.suite.db.util.ObservationTimeExtrema;
+import org.n52.sw.db.util.ObservationTimeExtrema;
 
 /**
  * Abstract valut time data access object

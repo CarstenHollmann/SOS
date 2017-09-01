@@ -37,7 +37,7 @@ import org.hibernate.criterion.Restrictions;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 import org.n52.sos.ds.hibernate.entities.parameter.Parameter;
 import org.n52.sos.ds.hibernate.entities.parameter.series.SeriesParameter;
-import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.db.util.HibernateHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

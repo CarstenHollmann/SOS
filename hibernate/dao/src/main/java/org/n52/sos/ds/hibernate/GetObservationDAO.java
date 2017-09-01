@@ -97,9 +97,9 @@ import org.n52.svalbard.encode.Encoder;
 import org.n52.svalbard.encode.EncoderRepository;
 import org.n52.svalbard.encode.ObservationEncoder;
 import org.n52.svalbard.encode.XmlEncoderKey;
-import org.n52.sw.suite.db.util.EntitiyHelper;
-import org.n52.sw.suite.db.util.ObservationTimeExtrema;
-import org.n52.sw.suite.db.util.QueryHelper;
+import org.n52.sw.db.util.EntitiyHelper;
+import org.n52.sw.db.util.ObservationTimeExtrema;
+import org.n52.sw.db.util.QueryHelper;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

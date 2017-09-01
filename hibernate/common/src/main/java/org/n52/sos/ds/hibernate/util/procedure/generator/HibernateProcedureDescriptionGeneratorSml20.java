@@ -52,7 +52,7 @@ import org.n52.sos.ds.hibernate.dao.DaoFactory;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.service.profile.ProfileHandler;
 import org.n52.sos.util.GeometryHandler;
-import org.n52.sw.suite.db.util.EntitiyHelper;
+import org.n52.sw.db.util.EntitiyHelper;
 
 /**
  * TODO JavaDoc

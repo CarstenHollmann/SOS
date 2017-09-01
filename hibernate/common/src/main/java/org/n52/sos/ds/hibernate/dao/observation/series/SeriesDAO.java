@@ -39,9 +39,9 @@ import org.n52.shetland.ogc.sos.request.GetObservationByIdRequest;
 import org.n52.shetland.ogc.sos.request.GetObservationRequest;
 import org.n52.shetland.util.CollectionHelper;
 import org.n52.sos.ds.hibernate.dao.DaoFactory;
-import org.n52.sos.ds.hibernate.dao.observation.ObservationContext;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sw.suite.db.util.QueryHelper;
+import org.n52.sw.db.dao.ObservationContext;
+import org.n52.sw.db.util.QueryHelper;
 
 /**
  * Hibernate data access class for series

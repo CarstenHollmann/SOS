@@ -48,7 +48,7 @@ import org.n52.sos.ds.hibernate.dao.observation.series.AbstractSeriesObservation
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.Procedure;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.db.util.HibernateHelper;
 
 /**
  * Implementation of the abstract class AbstractDeleteSensorHandler

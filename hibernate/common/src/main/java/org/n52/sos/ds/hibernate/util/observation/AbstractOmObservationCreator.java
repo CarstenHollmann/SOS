@@ -30,17 +30,25 @@ package org.n52.sos.ds.hibernate.util.observation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.n52.iceland.convert.ConverterException;
 import org.n52.iceland.convert.ConverterRepository;
 import org.n52.iceland.i18n.I18NDAORepository;
 import org.n52.iceland.util.LocalizedProducer;
 import org.n52.janmayen.http.MediaType;
+import org.n52.series.db.beans.AbstractFeatureEntity;
+import org.n52.series.db.beans.DataEntity;
+import org.n52.series.db.beans.DatasetEntity;
+import org.n52.series.db.beans.DescribableEntity;
+import org.n52.series.db.beans.PhenomenonEntity;
+import org.n52.series.db.beans.ProcedureEntity;
+import org.n52.series.db.beans.UnitEntity;
 import org.n52.shetland.iso.gmd.CiOnlineResource;
+import org.n52.shetland.ogc.UoM;
 import org.n52.shetland.ogc.gml.AbstractFeature;
 import org.n52.shetland.ogc.gml.CodeType;
 import org.n52.shetland.ogc.gml.CodeWithAuthority;
@@ -51,6 +59,7 @@ import org.n52.shetland.ogc.om.ObservationStream;
 import org.n52.shetland.ogc.om.OmConstants;
 import org.n52.shetland.ogc.om.OmObservableProperty;
 import org.n52.shetland.ogc.om.OmObservation;
+import org.n52.shetland.ogc.om.OmObservationConstellation;
 import org.n52.shetland.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.shetland.ogc.om.values.GeometryValue;
 import org.n52.shetland.ogc.ows.OwsServiceProvider;
@@ -63,23 +72,16 @@ import org.n52.shetland.ogc.sos.request.AbstractObservationRequest;
 import org.n52.sos.cache.SosContentCache;
 import org.n52.sos.ds.FeatureQueryHandler;
 import org.n52.sos.ds.FeatureQueryHandlerQueryObject;
-import org.n52.sos.ds.hibernate.dao.DaoFactory;
-import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
-import org.n52.sos.ds.hibernate.entities.AbstractIdentifierNameDescriptionEntity;
-import org.n52.sos.ds.hibernate.entities.ObservableProperty;
-import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sos.ds.hibernate.entities.feature.AbstractFeatureOfInterest;
-import org.n52.sos.ds.hibernate.entities.observation.Observation;
-import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 import org.n52.sos.ds.hibernate.util.procedure.generator.HibernateProcedureDescriptionGeneratorFactoryRepository;
 import org.n52.sos.service.profile.Profile;
 import org.n52.sos.util.GeometryHandler;
-import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.db.dao.DaoFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -235,7 +237,7 @@ public abstract class AbstractOmObservationCreator {
         return namedValue;
     }
 
-    protected OmObservableProperty createObservableProperty(ObservableProperty observableProperty)
+    protected OmObservableProperty createObservableProperty(PhenomenonEntity observableProperty)
             throws CodedException {
         String phenID = observableProperty.getIdentifier();
         String description = observableProperty.getDescription();
@@ -260,7 +262,7 @@ public abstract class AbstractOmObservationCreator {
      */
     protected SosProcedureDescription<?> createProcedure(String identifier)
             throws ConverterException, OwsExceptionReport {
-        return createProcedure(new ProcedureDAO(getDaoFactory()).getProcedureForIdentifier(identifier, getSession()));
+        return createProcedure(getDaoFactory().getProcedureDao(getSession()).get(identifier));
     }
 
     /**
@@ -275,7 +277,7 @@ public abstract class AbstractOmObservationCreator {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    protected SosProcedureDescription<?> createProcedure(Procedure hProcedure)
+    protected SosProcedureDescription<?> createProcedure(ProcedureEntity hProcedure)
             throws ConverterException, OwsExceptionReport {
         // Procedure hProcedure =
         // getDaoFactory().getProcedureDAO().getProcedureForIdentifier(identifier,
@@ -301,7 +303,7 @@ public abstract class AbstractOmObservationCreator {
      * @param hAbstractFeature
      */
     protected void addIdentifier(AbstractFeature abstractFeature,
-            AbstractIdentifierNameDescriptionEntity hAbstractFeature) {
+            DescribableEntity hAbstractFeature) {
         if (hAbstractFeature.isSetCodespace()) {
             abstractFeature.setIdentifier(new CodeWithAuthority(hAbstractFeature.getIdentifier(),
                     hAbstractFeature.getCodespace().getCodespace()));
@@ -315,7 +317,7 @@ public abstract class AbstractOmObservationCreator {
      *
      * @throws CodedException
      */
-    protected void addName(AbstractFeature abstractFeature, AbstractIdentifierNameDescriptionEntity hAbstractFeature)
+    protected void addName(AbstractFeature abstractFeature, DescribableEntity hAbstractFeature)
             throws CodedException {
         if (hAbstractFeature.isSetCodespaceName()) {
             try {
@@ -340,7 +342,7 @@ public abstract class AbstractOmObservationCreator {
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    protected AbstractFeature createFeatureOfInterest(AbstractFeatureOfInterest foi)
+    protected AbstractFeature createFeatureOfInterest(AbstractFeatureEntity foi)
             throws OwsExceptionReport {
         if (getActiveProfile().isEncodeFeatureOfInterestInObservations()) {
             FeatureQueryHandlerQueryObject queryObject = new FeatureQueryHandlerQueryObject(getSession());
@@ -389,8 +391,40 @@ public abstract class AbstractOmObservationCreator {
         final AbstractFeature feature = getFeatureQueryHandler().getFeatureByID(queryObject);
         return feature;
     }
+    
+    /**
+     * Get {@link OmObservationConstellation} from series information
+     *
+     * @param procedure
+     *            Procedure object
+     * @param obsProp
+     *            ObservableProperty object
+     * @param feature
+     *            FeatureOfInterest object
+     * @return Observation constellation
+     * @throws OwsExceptionReport
+     * @throws ConverterException 
+     */
+    protected OmObservationConstellation createObservationConstellation(DatasetEntity dataset) throws OwsExceptionReport, ConverterException {
+        SosProcedureDescription<?> procedure = createProcedure(dataset.getObservationConstellation().getProcedure());
+        OmObservableProperty obsProp = createObservableProperty(dataset.getObservationConstellation().getObservableProperty());
+        AbstractFeature feature = createFeatureOfInterest(dataset.getFeature());
+        HashSet<String> offerings = Sets.newHashSet(dataset.getOffering().getIdentifier());
+        
+        OmObservationConstellation obsConst = new OmObservationConstellation(procedure, obsProp, offerings, feature, null);
+        if (dataset.isSetIdentifier()) {
+            addIdentifier(obsConst, dataset);
+        }
+        if (dataset.isSetName()) {
+            addName(obsConst, dataset);
+        }
+        if (dataset.isSetDescription()) {
+            obsConst.setDescription(dataset.getDescription());
+        }
+        return obsConst;
+    }
 
-    protected void checkForAdditionalObservationCreator(Observation<?> hObservation, OmObservation sosObservation)
+    protected void checkForAdditionalObservationCreator(DataEntity<?> hObservation, OmObservation sosObservation)
             throws CodedException {
         for (AdditionalObservationCreatorKey key : getAdditionalObservationCreatorKeys(hObservation)) {
             if (getAdditionalObservationCreatorRepository().hasAdditionalObservationCreatorFor(key)) {
@@ -411,7 +445,7 @@ public abstract class AbstractOmObservationCreator {
         }
     }
 
-    private List<AdditionalObservationCreatorKey> getAdditionalObservationCreatorKeys(Observation<?> hObservation) {
+    private List<AdditionalObservationCreatorKey> getAdditionalObservationCreatorKeys(DataEntity<?> hObservation) {
         List<AdditionalObservationCreatorKey> keys = Lists.newArrayList();
         keys.add(new AdditionalObservationCreatorKey(getResponseFormat(), hObservation.getClass()));
         keys.add(new AdditionalObservationCreatorKey(getResponseFormat(), hObservation.getClass().getSuperclass()));
@@ -421,7 +455,7 @@ public abstract class AbstractOmObservationCreator {
     }
 
     private List<AdditionalObservationCreatorKey> getAdditionalObservationCreatorKeys(List<MediaType> acceptType,
-            Observation<?> hObservation) {
+            DataEntity<?> hObservation) {
         List<AdditionalObservationCreatorKey> keys = Lists.newArrayList();
         for (MediaType mediaType : acceptType) {
             keys.add(new AdditionalObservationCreatorKey(mediaType.withoutParameters().toString(),
@@ -435,28 +469,23 @@ public abstract class AbstractOmObservationCreator {
     public static String checkVersion(AbstractObservationRequest request) {
         return request != null ? request.getVersion() : null;
     }
-
-    protected String queryUnit(Series series) {
-        if (series.isSetUnit()) {
-            return series.getUnit().getUnit();
-        } else if (HibernateHelper.isNamedQuerySupported(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES,
-                getSession())) {
-            Query namedQuery = getSession().getNamedQuery(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES);
-            namedQuery.setParameter(Series.OBSERVABLE_PROPERTY, series.getObservableProperty().getIdentifier());
-            namedQuery.setParameter(Series.PROCEDURE, series.getProcedure().getIdentifier());
-            LOGGER.debug("QUERY queryUnit({}, {}) with NamedQuery '{}': {}",
-                    series.getObservableProperty().getIdentifier(), series.getProcedure().getIdentifier(),
-                    SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_PROCEDURE_SERIES, namedQuery.getQueryString());
-            return (String) namedQuery.uniqueResult();
-        } else if (HibernateHelper.isNamedQuerySupported(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES,
-                getSession())) {
-            Query namedQuery = getSession().getNamedQuery(SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES);
-            namedQuery.setParameter(Series.OBSERVABLE_PROPERTY, series.getObservableProperty().getIdentifier());
-            LOGGER.debug("QUERY queryUnit({}) with NamedQuery '{}': {}",
-                    series.getObservableProperty().getIdentifier(), SQL_QUERY_GET_UNIT_FOR_OBSERVABLE_PROPERTY_SERIES,
-                    namedQuery.getQueryString());
-            return (String) namedQuery.uniqueResult();
-        }
+    
+    protected UoM createUnit(DatasetEntity dataset) {
+        if (dataset.hasUnit()) {
+            return createUnit(dataset.getUnit());
+        } 
         return null;
     }
+    
+    private UoM createUnit(UnitEntity entitiy) {
+        UoM unit = new UoM(entitiy.getUnit());
+        if (entitiy.isSetName()) {
+            unit.setName(entitiy.getName());
+        }
+        if (entitiy.isSetLink()) {
+            unit.setLink(entitiy.getLink());
+        }
+        return unit;
+    }
+
 }

@@ -49,8 +49,8 @@ import org.n52.sos.ds.hibernate.entities.ValidProcedureTime;
 import org.n52.sos.exception.ows.concrete.UnsupportedOperatorException;
 import org.n52.sos.exception.ows.concrete.UnsupportedTimeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedValueReferenceException;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.QueryHelper;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.QueryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -50,7 +50,7 @@ import org.n52.sos.ds.hibernate.entities.ereporting.EReportingAssessmentType;
 import org.n52.sos.ds.hibernate.entities.ereporting.EReportingSamplingPoint;
 import org.n52.sos.ds.hibernate.entities.observation.ereporting.EReportingSeries;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sw.suite.db.util.QueryHelper;
+import org.n52.sw.db.util.QueryHelper;
 
 public class EReportingSeriesDAO extends AbstractSeriesDAO {
 

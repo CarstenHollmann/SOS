@@ -51,6 +51,7 @@ import org.n52.sos.ds.hibernate.HibernateTestCase;
 import org.n52.sos.ds.hibernate.dao.DaoFactory;
 import org.n52.sos.ds.hibernate.dao.ObservablePropertyDAO;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
+import org.n52.sw.db.util.ScrollableIterable;
 
 
 public class ObservablePropertyDAOTest extends HibernateTestCase {

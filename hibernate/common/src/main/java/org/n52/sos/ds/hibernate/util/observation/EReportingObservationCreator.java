@@ -29,42 +29,43 @@
 package org.n52.sos.ds.hibernate.util.observation;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.Session;
+import org.n52.series.db.beans.DataEntity;
+import org.n52.series.db.beans.DatasetEntity;
+import org.n52.series.db.beans.ereporting.EReportingBlobDataEntity;
+import org.n52.series.db.beans.ereporting.EReportingBooleanDataEntity;
+import org.n52.series.db.beans.ereporting.EReportingCategoryDataEntity;
+import org.n52.series.db.beans.ereporting.EReportingCountDataEntity;
+import org.n52.series.db.beans.ereporting.EReportingDataEntity;
+import org.n52.series.db.beans.ereporting.EReportingDatasetEntity;
+import org.n52.series.db.beans.ereporting.EReportingGeometryDataEntity;
+import org.n52.series.db.beans.ereporting.EReportingQuantityDataEntity;
+import org.n52.series.db.beans.ereporting.EReportingSweDataArrayDataEntity;
+import org.n52.series.db.beans.ereporting.EReportingTextDataEntity;
 import org.n52.shetland.aqd.AqdConstants;
 import org.n52.shetland.ogc.om.NamedValue;
 import org.n52.shetland.ogc.om.OmConstants;
 import org.n52.shetland.ogc.om.OmObservation;
 import org.n52.shetland.ogc.ows.exception.CodedException;
-import org.n52.sos.ds.hibernate.entities.observation.Observation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.AbstractEReportingObservation;
 import org.n52.sos.ds.hibernate.entities.observation.ereporting.EReportingObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.EReportingSeries;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.full.EReportingBlobObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.full.EReportingBooleanObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.full.EReportingCategoryObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.full.EReportingCountObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.full.EReportingGeometryObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.full.EReportingNumericObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.full.EReportingSweDataArrayObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.full.EReportingTextObservation;
-import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 
 public class EReportingObservationCreator implements AdditionalObservationCreator {
 
     private static final Set<AdditionalObservationCreatorKey> KEYS
             = AdditionalObservationCreatorRepository
             .encoderKeysForElements(AqdConstants.NS_AQD,
-                                    AbstractEReportingObservation.class,
-                                    EReportingBlobObservation.class,
-                                    EReportingBooleanObservation.class,
-                                    EReportingCategoryObservation.class,
-                                    EReportingCountObservation.class,
-                                    EReportingGeometryObservation.class,
-                                    EReportingNumericObservation.class,
-                                    EReportingSweDataArrayObservation.class,
-                                    EReportingTextObservation.class);
+                                    EReportingDataEntity.class,
+                                    EReportingBlobDataEntity.class,
+                                    EReportingBooleanDataEntity.class,
+                                    EReportingCategoryDataEntity.class,
+                                    EReportingCountDataEntity.class,
+                                    EReportingGeometryDataEntity.class,
+                                    EReportingQuantityDataEntity.class,
+                                    EReportingSweDataArrayDataEntity.class,
+                                    EReportingTextDataEntity.class);
 
     private final EReportingObservationHelper helper
             = new EReportingObservationHelper();
@@ -75,10 +76,10 @@ public class EReportingObservationCreator implements AdditionalObservationCreato
     }
 
     @Override
-    public OmObservation create(OmObservation omObservation, Observation<?> observation) throws CodedException {
-        if (observation instanceof EReportingObservation) {
-            EReportingObservation<?> eReportingObservation = (EReportingObservation<?>) observation;
-            create(omObservation, eReportingObservation.getEReportingSeries());
+    public OmObservation create(OmObservation omObservation, DataEntity observation) throws CodedException {
+        if (observation instanceof EReportingDataEntity) {
+            EReportingDataEntity eReportingObservation = (EReportingDataEntity) observation;
+            create(omObservation, (DatasetEntity)eReportingObservation.getDatasets().iterator().next());
             add(omObservation, observation);
             omObservation.setValue(EReportingHelper.createSweDataArrayValue(omObservation, eReportingObservation));
             omObservation.getObservationConstellation().setObservationType(OmConstants.OBS_TYPE_SWE_ARRAY_OBSERVATION);
@@ -87,35 +88,35 @@ public class EReportingObservationCreator implements AdditionalObservationCreato
     }
 
     @Override
-    public OmObservation create(OmObservation omObservation, Series series) {
-        EReportingSeries ereportingSeries = (EReportingSeries) series;
-        for (NamedValue<?> namedValue : helper.createOmParameterForEReporting(ereportingSeries)) {
+    public OmObservation create(OmObservation omObservation, DatasetEntity dataset) {
+        EReportingDatasetEntity ereportingDatasetEntity = (EReportingDatasetEntity) dataset;
+        for (NamedValue<?> namedValue : helper.createOmParameterForEReporting(ereportingDatasetEntity)) {
             omObservation.addParameter(namedValue);
         }
         return omObservation;
     }
 
     @Override
-    public OmObservation create(OmObservation omObservation, Series series, Session session) throws CodedException {
-        return create(omObservation, series);
+    public OmObservation create(OmObservation omObservation, DatasetEntity dataset, Session session) throws CodedException {
+        return create(omObservation, dataset);
     }
 
     @Override
-    public OmObservation create(OmObservation omObservation, Observation<?> observation, Session session) throws CodedException {
+    public OmObservation create(OmObservation omObservation, DataEntity observation, Session session) throws CodedException {
         return create(omObservation, observation);
     }
 
     @Override
-    public OmObservation add(OmObservation omObservation, Observation<?> observation) {
+    public OmObservation add(OmObservation omObservation, DataEntity observation) {
         if (observation instanceof EReportingObservation) {
-            EReportingObservation<?> eReportingObservation = (EReportingObservation<?>) observation;
+            EReportingDataEntity eReportingObservation = (EReportingDataEntity) observation;
             omObservation.setAdditionalMergeIndicator(eReportingObservation.getPrimaryObservation());
         }
         return omObservation;
     }
 
     @Override
-    public OmObservation add(OmObservation omObservation, Observation<?> observation, Session session) {
+    public OmObservation add(OmObservation omObservation, DataEntity observation, Session session) {
         return add(omObservation, observation);
     }
 

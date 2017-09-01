@@ -45,6 +45,7 @@ import org.n52.iceland.convert.ConverterException;
 import org.n52.iceland.ds.ConnectionProvider;
 import org.n52.iceland.i18n.I18NSettings;
 import org.n52.iceland.ogc.ows.OwsServiceMetadataRepository;
+import org.n52.series.db.beans.DatasetEntity;
 import org.n52.shetland.ogc.om.ObservationStream;
 import org.n52.shetland.ogc.om.OmObservation;
 import org.n52.shetland.ogc.ows.exception.CodedException;
@@ -64,7 +65,8 @@ import org.n52.svalbard.encode.Encoder;
 import org.n52.svalbard.encode.EncoderRepository;
 import org.n52.svalbard.encode.ObservationEncoder;
 import org.n52.svalbard.encode.XmlEncoderKey;
-import org.n52.sw.suite.db.util.HibernateHelper;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.dao.DaoFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,8 +173,7 @@ public class GetObservationByIdDao
     @SuppressWarnings("unchecked")
     private List<Observation<?>> queryObservation(GetObservationByIdRequest request, Session session)
             throws OwsExceptionReport {
-        Criteria c = daoFactory.getObservationDAO().getObservationClassCriteriaForResultModel(request.getResultModel(),
-                session);
+        Criteria c = daoFactory.getObservationDao(session).getObservationClassCriteriaForResultModel(request.getResultModel());
         c.add(Restrictions.in(AbstractObservation.IDENTIFIER, request.getObservationIdentifier()));
         LOGGER.debug("QUERY queryObservation(request): {}", HibernateHelper.getSqlString(c));
         return c.list();
@@ -196,16 +197,16 @@ public class GetObservationByIdDao
         final long start = System.currentTimeMillis();
         final List<OmObservation> result = new LinkedList<OmObservation>();
         // get valid featureOfInterest identifier
-        List<Series> serieses = daoFactory.getSeriesDAO().getSeries(request, session);
-        HibernateGetObservationHelper.checkMaxNumberOfReturnedSeriesSize(serieses.size());
-        for (Series series : serieses) {
+        List<DatasetEntity> datasets = daoFactory.getSeriesDao(session).get(request);
+        HibernateGetObservationHelper.checkMaxNumberOfReturnedSeriesSize(datasets.size());
+        for (DatasetEntity dataset : datasets) {
             ObservationStream createSosObservationFromSeries =
-                    HibernateObservationUtilities.createSosObservationFromSeries(series, request,
+                    HibernateObservationUtilities.createSosObservationFromSeries(dataset, request,
                             getProcedureDescriptionFormat(request.getResponseFormat()), observationCreatorContext, session);
             OmObservation observationTemplate = createSosObservationFromSeries.next();
             HibernateSeriesStreamingValue streamingValue =
                     new HibernateChunkSeriesStreamingValue(sessionHolder.getConnectionProvider(), daoFactory, request,
-                            series.getSeriesId(), request.isCheckForDuplicity());
+                            dataset.getId(), request.isCheckForDuplicity());
             streamingValue.setResponseFormat(request.getResponseFormat());
             streamingValue.setObservationTemplate(observationTemplate);
             observationTemplate.setValue(streamingValue);

@@ -75,12 +75,13 @@ import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 import org.n52.sos.exception.ows.concrete.UnsupportedOperatorException;
 import org.n52.sos.exception.ows.concrete.UnsupportedTimeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedValueReferenceException;
-import org.n52.sw.suite.db.util.EntitiyHelper;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.NoopTransformerAdapter;
-import org.n52.sw.suite.db.util.ProcedureTimeExtrema;
-import org.n52.sw.suite.db.util.QueryHelper;
-import org.n52.sw.suite.db.util.TimeExtrema;
+import org.n52.sw.db.dao.QueryConstants;
+import org.n52.sw.db.util.EntitiyHelper;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.NoopTransformerAdapter;
+import org.n52.sw.db.util.ProcedureTimeExtrema;
+import org.n52.sw.db.util.QueryHelper;
+import org.n52.sw.db.util.TimeExtrema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,7 @@ import com.google.common.collect.Sets;
  * @author CarstenHollmann
  * @since 4.0.0
  */
-public class ProcedureDAO extends AbstractIdentifierNameDescriptionDAO implements HibernateSqlQueryConstants {
+public class ProcedureDAO extends AbstractIdentifierNameDescriptionDAO implements QueryConstants {
     // public class ProcedureDAO extends TimeCreator implements
     // HibernateSqlQueryConstants {
 

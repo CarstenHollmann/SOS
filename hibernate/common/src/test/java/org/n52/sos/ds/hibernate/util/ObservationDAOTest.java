@@ -45,6 +45,7 @@ import org.n52.sos.ds.hibernate.dao.DaoFactory;
 import org.n52.sos.ds.hibernate.dao.OfferingDAO;
 import org.n52.sos.ds.hibernate.dao.observation.AbstractObservationDAO;
 import org.n52.sos.ds.hibernate.entities.observation.Observation;
+import org.n52.sw.db.util.ScrollableIterable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -82,9 +82,9 @@ import org.n52.sos.ds.hibernate.entities.observation.ContextualReferencedObserva
 import org.n52.sos.ds.hibernate.entities.observation.series.ContextualReferencedSeriesObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
 import org.n52.sos.service.Configurator;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.NoopTransformerAdapter;
-import org.n52.sw.suite.db.util.QueryHelper;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.NoopTransformerAdapter;
+import org.n52.sw.db.util.QueryHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -49,8 +49,8 @@ import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.ObservableProperty;
 import org.n52.sos.ds.hibernate.entities.ObservationConstellation;
 import org.n52.sos.ds.hibernate.entities.TObservableProperty;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.ObservationConstellationInfo;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.ObservationConstellationInfo;
 
 /**
  *

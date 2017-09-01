@@ -31,6 +31,7 @@ package org.n52.sos.ds.hibernate.util.observation;
 import java.util.List;
 import java.util.Set;
 
+import org.n52.series.db.beans.ereporting.HiberanteEReportingRelations;
 import org.n52.shetland.aqd.AqdConstants;
 import org.n52.shetland.aqd.AqdConstants.PrimaryObservation;
 import org.n52.shetland.aqd.AqdUomRepository;
@@ -58,9 +59,6 @@ import org.n52.shetland.ogc.swe.simpleType.SweQuantity;
 import org.n52.shetland.ogc.swe.simpleType.SweTime;
 import org.n52.shetland.util.DateTimeHelper;
 import org.n52.shetland.util.JavaHelper;
-import org.n52.sos.ds.hibernate.entities.observation.AbstractTemporalReferencedObservation;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.HiberanteEReportingRelations.EReportingQualityData;
-import org.n52.sos.ds.hibernate.entities.observation.ereporting.HiberanteEReportingRelations.EReportingValues;
 import org.n52.svalbard.util.SweHelper;
 
 import com.google.common.collect.Lists;
@@ -97,7 +95,7 @@ public class EReportingHelper {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static SingleObservationValue<?> createSweDataArrayValue(OmObservation omObservation,
-            EReportingValues observation) throws CodedException {
+            HiberanteEReportingRelations.EReportingValues observation) throws CodedException {
         SweDataArrayValue sweDataArrayValue = new SweDataArrayValue();
         sweDataArrayValue.setValue(createSweDataArray(omObservation, observation));
         SingleObservationValue observationValue = new SingleObservationValue(sweDataArrayValue);
@@ -116,7 +114,7 @@ public class EReportingHelper {
      *            {@link EReportingValue} to create {@link SweDataArray} from
      * @return Created {@link SweDataArray}
      */
-    public static SweDataArray createSweDataArray(OmObservation omObservation, EReportingValues observation) {
+    public static SweDataArray createSweDataArray(OmObservation omObservation, HiberanteEReportingRelations.EReportingValues observation) {
         SweDataArray sweDataArray = new SweDataArray();
         sweDataArray.setElementCount(createElementCount(omObservation));
         PrimaryObservation primaryObservation = PrimaryObservation.from(observation.getPrimaryObservation());
@@ -142,11 +140,9 @@ public class EReportingHelper {
         return combinedValue;
     }
 
-    private static String getUnit(OmObservation omObservation, EReportingValues observation) {
+    private static String getUnit(OmObservation omObservation, HiberanteEReportingRelations.EReportingValues observation) {
         if (omObservation.isSetValue() && omObservation.getValue().getValue().isSetUnit()) {
             return omObservation.getValue().getValue().getUnit();
-        } else if (observation.isSetUnit()) {
-            return observation.getUnit().getUnit();
         }
         return null;
     }
@@ -237,7 +233,7 @@ public class EReportingHelper {
         }
     }
 
-    private static void addValue(List<String> value, EReportingValues observation, OmObservation omObservation) {
+    private static void addValue(List<String> value, HiberanteEReportingRelations.EReportingValues observation, OmObservation omObservation) {
         if (observation.isSetValue()) {
             // TODO check if this is the best solution
             if (omObservation.isSetDecimalSeparator() && omObservation.getDecimalSeparator() != ".") {
@@ -250,7 +246,7 @@ public class EReportingHelper {
         }
     }
 
-    private static List<List<String>> createValue(OmObservation omObservation, EReportingValues observation, PrimaryObservation primaryObservation) {
+    private static List<List<String>> createValue(OmObservation omObservation, HiberanteEReportingRelations.EReportingValues observation, PrimaryObservation primaryObservation) {
         List<String> value = Lists.newArrayListWithCapacity(5);
         addTimes(value, ((AbstractTemporalReferencedObservation) observation).createPhenomenonTime());
         addIntegerValue(value, observation.getVerification());
@@ -293,11 +289,11 @@ public class EReportingHelper {
         return time;
     }
 
-    private static void addQuality(EReportingValues eReportingObservation, SingleObservationValue<?> value) throws CodedException {
+    private static void addQuality(HiberanteEReportingRelations.EReportingValues eReportingObservation, SingleObservationValue<?> value) throws CodedException {
         value.addQualityList(getGmdDomainConsistency(eReportingObservation, false));
     }
 
-    public static Set<OmResultQuality> getGmdDomainConsistency(EReportingQualityData eReportingObservation, boolean force) throws CodedException {
+    public static Set<OmResultQuality> getGmdDomainConsistency(HiberanteEReportingRelations.EReportingQualityData eReportingObservation, boolean force) throws CodedException {
         Set<OmResultQuality> set = Sets.newHashSet();
         if (eReportingObservation.isSetDataCaptureFlag()) {
             set.add(GmdDomainConsistency.dataCapture(eReportingObservation.getDataCaptureFlag()));

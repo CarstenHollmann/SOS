@@ -38,7 +38,7 @@ import org.n52.shetland.ogc.om.OmConstants;
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.sos.ds.hibernate.H2Configuration;
 import org.n52.sos.ds.hibernate.entities.ObservationType;
-import org.n52.sos.ds.hibernate.util.ScrollableIterable;
+import org.n52.sw.db.util.ScrollableIterable;
 
 /**
  * @author Christian Autermann <c.autermann@52north.org>

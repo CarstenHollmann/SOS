@@ -66,9 +66,10 @@ import org.n52.sos.ds.hibernate.entities.TOffering;
 import org.n52.sos.ds.hibernate.entities.observation.AbstractObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.ContextualReferencedSeriesObservation;
 import org.n52.sos.ds.hibernate.entities.observation.series.Series;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.NoopTransformerAdapter;
-import org.n52.sw.suite.db.util.OfferingTimeExtrema;
+import org.n52.sw.db.dao.QueryConstants;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.NoopTransformerAdapter;
+import org.n52.sw.db.util.OfferingTimeExtrema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,7 @@ import com.google.common.collect.Maps;
  * @author CarstenHollmann
  * @since 4.0.0
  */
-public class OfferingDAO extends TimeCreator implements HibernateSqlQueryConstants {
+public class OfferingDAO extends TimeCreator implements QueryConstants {
 
     private static final String SQL_QUERY_OFFERING_TIME_EXTREMA = "getOfferingTimeExtrema";
     private static final String SQL_QUERY_GET_MIN_DATE_FOR_OFFERING = "getMinDate4Offering";

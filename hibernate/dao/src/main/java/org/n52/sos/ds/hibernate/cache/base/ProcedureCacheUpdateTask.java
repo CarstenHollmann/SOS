@@ -40,8 +40,8 @@ import org.n52.sos.ds.hibernate.cache.AbstractThreadableDatasourceCacheUpdate;
 import org.n52.sos.ds.hibernate.dao.DaoFactory;
 import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
 import org.n52.sos.ds.hibernate.entities.Procedure;
-import org.n52.sw.suite.db.util.HibernateHelper;
-import org.n52.sw.suite.db.util.TimeExtrema;
+import org.n52.sw.db.util.HibernateHelper;
+import org.n52.sw.db.util.TimeExtrema;
 
 import com.google.common.collect.Sets;
 

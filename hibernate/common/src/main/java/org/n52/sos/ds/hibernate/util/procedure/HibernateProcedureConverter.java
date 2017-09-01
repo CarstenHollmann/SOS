@@ -39,6 +39,7 @@ import org.n52.iceland.convert.ConverterException;
 import org.n52.iceland.convert.ConverterRepository;
 import org.n52.iceland.util.LocalizedProducer;
 import org.n52.janmayen.http.HTTPStatus;
+import org.n52.series.db.beans.ProcedureEntity;
 import org.n52.shetland.ogc.gml.time.TimePeriod;
 import org.n52.shetland.ogc.ows.OwsServiceProvider;
 import org.n52.shetland.ogc.ows.exception.InvalidParameterValueException;
@@ -49,7 +50,6 @@ import org.n52.shetland.ogc.sensorML.SensorML;
 import org.n52.shetland.ogc.sensorML.v20.AbstractProcessV20;
 import org.n52.shetland.ogc.sos.SosConstants;
 import org.n52.shetland.ogc.sos.SosProcedureDescription;
-import org.n52.sos.ds.hibernate.dao.HibernateSqlQueryConstants;
 import org.n52.sos.ds.hibernate.entities.DescriptionXmlEntity;
 import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasProcedureDescriptionFormat;
 import org.n52.sos.ds.hibernate.entities.Procedure;
@@ -62,6 +62,7 @@ import org.n52.sos.ds.hibernate.util.procedure.create.ValidProcedureTimeDescript
 import org.n52.sos.ds.hibernate.util.procedure.create.XmlStringDescriptionCreationStrategy;
 import org.n52.sos.ds.hibernate.util.procedure.enrich.ProcedureDescriptionEnrichments;
 import org.n52.sos.ds.procedure.AbstractProcedureConverter;
+import org.n52.sw.db.dao.QueryConstants;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
@@ -80,8 +81,8 @@ import com.google.common.collect.Lists;
  *        (creates, file, or database) - use setting switches for code flow
  */
 public class HibernateProcedureConverter
-        extends AbstractProcedureConverter<Procedure>
-        implements HibernateSqlQueryConstants {
+        extends AbstractProcedureConverter<ProcedureEntity>
+        implements QueryConstants {
 
     private final HibernateProcedureCreationContext ctx;
     private LocalizedProducer<OwsServiceProvider> serviceProvider;
@@ -113,7 +114,7 @@ public class HibernateProcedureConverter
      * @throws OwsExceptionReport
      *             If an error occurs
      */
-    public SosProcedureDescription<?> createSosProcedureDescription(Procedure procedure,
+    public SosProcedureDescription<?> createSosProcedureDescription(ProcedureEntity procedure,
             String requestedDescriptionFormat, String requestedServiceVersion, Locale i18n, Session session)
             throws OwsExceptionReport {
         if (procedure == null) {
