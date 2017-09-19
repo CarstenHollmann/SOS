@@ -154,6 +154,12 @@ public class ParameterDAO {
             this.parameterFactory = daos.parameter.getParameterFactory();
         }
 
+        @Override
+        public ValuedParameter<?> visit(QuantityRangeValue value) throws OwsExceptionReport {
+            /* TODO implement org.n52.sos.ds.hibernate.dao.ParameterDAO.ParameterPersister.visit() */
+            throw new UnsupportedOperationException("org.n52.sos.ds.hibernate.dao.ParameterDAO.ParameterPersister.visit() not yet implemented");
+        }
+
         private static class Caches {
             private final Map<UoM, Unit> units;
 

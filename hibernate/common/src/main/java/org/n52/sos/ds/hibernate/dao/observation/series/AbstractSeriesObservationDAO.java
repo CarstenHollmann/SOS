@@ -94,6 +94,7 @@ public abstract class AbstractSeriesObservationDAO extends AbstractObservationDA
         super(daoFactory);
     }
 
+
     @Override
     protected void addObservationContextToObservation(ObservationContext ctx,
             Observation<?> observation, Session session) throws OwsExceptionReport {

@@ -177,10 +177,8 @@ public abstract class AbstractObservationDAO
 
     private static final String SQL_QUERY_OBSERVATION_TIME_EXTREMA = "getObservationTimeExtrema";
 
-    private final DaoFactory daoFactory;
-
     public AbstractObservationDAO(DaoFactory daoFactory) {
-        this.daoFactory = daoFactory;
+        super(daoFactory);
     }
 
     protected DaoFactory getDaoFactory() {
@@ -660,7 +658,7 @@ public abstract class AbstractObservationDAO
         ObservationPersister persister = new ObservationPersister(
                 getGeometryHandler(),
                 this,
-                this.daoFactory,
+                getDaoFactory(),
                 sosObservation,
                 hObservationConstellations,
                 hFeature,
@@ -1609,6 +1607,11 @@ public abstract class AbstractObservationDAO
              */
             daos.observation.checkForDuplicatedObservations(sosObservation, observationConstellations.iterator().next(), session);
 
+        }
+
+        @Override
+        public Observation<?> visit(QuantityRangeValue value) throws OwsExceptionReport {
+              throw notSupported(value);
         }
 
         @Override

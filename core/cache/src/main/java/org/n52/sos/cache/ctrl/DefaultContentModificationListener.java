@@ -28,7 +28,9 @@
  */
 package org.n52.sos.cache.ctrl;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -62,8 +64,6 @@ import org.n52.sos.event.events.DeleteObservationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Sets;
-
 /**
  * @author <a href="mailto:c.autermann@52north.org">Christian Autermann</a>
  * @since 4.0.0
@@ -83,10 +83,16 @@ public class DefaultContentModificationListener
                     UpdateCache.class,
                     ResultTemplatesDeletion.class);
 
-    private CacheFeederHandler handler;
-    private ContentCacheController controller;
+    private final CacheFeederHandler handler;
+    private final ContentCacheController controller;
     private SupportedTypeRepository supportedTypeRepository;
     private ConverterRepository converterRepository;
+
+    @Inject
+    public DefaultContentModificationListener(CacheFeederHandler handler, ContentCacheController controller) {
+        this.handler = handler;
+        this.controller = controller;
+    }
 
     @Override
     public Set<Class<? extends Event>> getTypes() {
@@ -95,22 +101,26 @@ public class DefaultContentModificationListener
 
     @Override
     public void handle(Event event) {
+        ContentCacheUpdate update = createUpdate(event);
+        LOGGER.debug("Updating Cache after content modification: {}", update);
+        try {
+            this.controller.update(update);
+        } catch (OwsExceptionReport ex) {
+            LOGGER.error("Error processing Event", ex);
+        }
+    }
+
+    private ContentCacheUpdate createUpdate(Event event) {
         if (event instanceof SensorInsertion) {
-            SensorInsertion e = (SensorInsertion) event;
-            handle(new SensorInsertionUpdate(e.getRequest(), e.getResponse(), converterRepository));
+            return createUpdate((SensorInsertion) event);
         } else if (event instanceof ObservationInsertion) {
-            ObservationInsertion e = (ObservationInsertion) event;
-            handle(new ObservationInsertionUpdate(e.getRequest()));
+            return createUpdate((ObservationInsertion) event);
         } else if (event instanceof ResultTemplateInsertion) {
-            ResultTemplateInsertion e = (ResultTemplateInsertion) event;
-            handle(new ResultTemplateInsertionUpdate(e.getRequest(), e.getResponse()));
+            return createUpdate((ResultTemplateInsertion) event);
         } else if (event instanceof SensorDeletion) {
-            SensorDeletion e = (SensorDeletion) event;
-            handle(new SensorDeletionUpdate(this.handler, e.getRequest()));
+            return createUpdate((SensorDeletion) event);
         } else if (event instanceof ResultInsertion) {
-            ResultInsertion e = (ResultInsertion) event;
-            handle(new ResultInsertionUpdate(e.getRequest().getTemplateIdentifier(),
-                    e.getResponse().getObservations()));
+            return createUpdate((ResultInsertion) event);
         } else if (event instanceof FeatureInsertion) {
             FeatureInsertion e = (FeatureInsertion) event;
             handle(new FeatureInsertionUpdate(e.getRequest()));
@@ -122,27 +132,20 @@ public class DefaultContentModificationListener
         } else if (event instanceof DeleteObservationEvent) {
             handle(new DeleteObservationUpdate(handler, ((DeleteObservationEvent) event).getDeletedObservation()));
         } else {
-            LOGGER.debug("Can not handle modification event: {}", event);
+            throw new AssertionError();
         }
     }
 
-    protected void handle(ContentCacheUpdate update) {
-        LOGGER.debug("Updating Cache after content modification: {}", update);
-        try {
-            this.controller.update(update);
-        } catch (OwsExceptionReport ex) {
-            LOGGER.error("Error processing Event", ex);
-        }
+    private ContentCacheUpdate createUpdate(ResultInsertion e) {
+        return new ResultInsertionUpdate(e.getRequest().getTemplateIdentifier(), e.getResponse().getObservations());
     }
 
-    @Inject
-    public void setHandler(CacheFeederHandler handler) {
-        this.handler = handler;
+    private ContentCacheUpdate createUpdate(SensorDeletion e) {
+        return new SensorDeletionUpdate(this.handler, e.getRequest());
     }
 
-    @Inject
-    public void setController(ContentCacheController controller) {
-        this.controller = controller;
+    private ContentCacheUpdate createUpdate(ResultTemplateInsertion e) {
+        return new ResultTemplateInsertionUpdate(e.getRequest(), e.getResponse());
     }
 
     @Inject
@@ -154,4 +157,13 @@ public class DefaultContentModificationListener
     public void setSupportedTypeRepository(SupportedTypeRepository supportedTypeRepository) {
         this.supportedTypeRepository = supportedTypeRepository;
     }
+
+    private ContentCacheUpdate createUpdate(ObservationInsertion e) {
+        return new ObservationInsertionUpdate(e.getRequest());
+    }
+
+    private ContentCacheUpdate createUpdate(SensorInsertion e) {
+        return new SensorInsertionUpdate(e.getRequest(), e.getResponse());
+    }
+
 }

@@ -85,6 +85,11 @@ public class DaoFactory {
     private DecoderRepository decoderRepository;
     private XmlOptionsHelper xmlOptionsHelper;
 
+    @Inject
+    public DaoFactory(I18NDAORepository i18NDAORepository) {
+        this.i18NDAORepository = i18NDAORepository;
+    }
+
     @Setting(value = EReportingSetting.EREPORTING_VALIDITY_FLAGS, required = false)
     public void setValidityFlags(String validityFlags) {
         this.validityFlags = Optional.ofNullable(validityFlags).map(s -> Arrays.stream(s.split(","))
@@ -238,6 +243,10 @@ public class DaoFactory {
 
     public ProcedureDescriptionFormatDAO getProcedureDescriptionFormatDAO() {
         return new ProcedureDescriptionFormatDAO();
+    }
+
+    public I18NDAORepository getI18NDAORepository() {
+        return i18NDAORepository;
     }
 
 }

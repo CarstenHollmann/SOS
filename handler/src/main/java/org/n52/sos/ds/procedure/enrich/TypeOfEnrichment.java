@@ -31,8 +31,8 @@ package org.n52.sos.ds.procedure.enrich;
 import java.net.MalformedURLException;
 
 import org.n52.janmayen.http.MediaTypes;
+import org.n52.janmayen.http.MediaTypes;
 import org.n52.shetland.ogc.gml.ReferenceType;
-import org.n52.shetland.ogc.ows.exception.CodedException;
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.shetland.ogc.sos.Sos1Constants;
 import org.n52.shetland.ogc.sos.Sos2Constants;
@@ -126,7 +126,29 @@ public class TypeOfEnrichment extends ProcedureDescriptionEnrichment {
                LOGGER.error("Error while encoding DescribeSensor URL!", murle);
             }
         }
-        return href;
+        try {
+            String version = getServiceOperatorRepository().isVersionSupported(SosConstants.SOS,
+                                                                               Sos2Constants.SERVICEVERSION)
+                                     ? Sos2Constants.SERVICEVERSION
+                                     : Sos1Constants.SERVICEVERSION;
+
+            return SosHelper.getDescribeSensorUrl(version, getServiceURL(), identifier, format).toString();
+        } catch (MalformedURLException murle) {
+            LOGGER.error("Error while encoding DescribeSensor URL!", murle);
+            return identifier;
+        }
+    }
+
+    private static BindingRepository getBindingRepository() {
+        return BindingRepository.getInstance();
+    }
+
+    private static ServiceOperatorRepository getServiceOperatorRepository() {
+        return ServiceOperatorRepository.getInstance();
+    }
+
+    private static String getServiceURL() {
+        return ServiceConfiguration.getInstance().getServiceURL();
     }
 
 }

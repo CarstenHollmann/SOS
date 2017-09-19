@@ -103,11 +103,6 @@ public abstract class AbstractBaseObservation
     }
 
     @Override
-    public boolean hasSamplingGeometry() {
-        return getSamplingGeometry() != null && !getSamplingGeometry().isEmpty();
-    }
-
-    @Override
     public Object getLongitude() {
         return longitude;
     }
@@ -210,11 +205,6 @@ public abstract class AbstractBaseObservation
         } else {
             getParameters().add((Parameter) parameters);
         }
-    }
-
-    @Override
-    public boolean hasParameters() {
-        return CollectionHelper.isNotEmpty(getParameters());
     }
 
     @Override

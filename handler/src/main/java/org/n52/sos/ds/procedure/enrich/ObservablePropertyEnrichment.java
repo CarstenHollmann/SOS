@@ -49,6 +49,12 @@ public class ObservablePropertyEnrichment
         super(ctx);
     }
 
+    private final I18NDAORepository i18NDAORepository;
+
+    public ObservablePropertyEnrichment(I18NDAORepository i18NDAORepository) {
+        this.i18NDAORepository = i18NDAORepository;
+    }
+
     @Override
     public void enrich()
             throws OwsExceptionReport {

@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.n52.iceland.i18n.I18NDAO;
-import org.n52.iceland.i18n.I18NDAORepository;
 import org.n52.iceland.i18n.metadata.I18NFeatureMetadata;
 import org.n52.shetland.ogc.OGCConstants;
 import org.n52.shetland.ogc.gml.AbstractFeature;
@@ -48,6 +47,12 @@ import org.n52.sos.ds.hibernate.entities.IdentifierNameDescriptionEntity;
 import org.n52.sos.ds.hibernate.entities.feature.FeatureOfInterest;
 
 public class AbstractIdentifierNameDescriptionDAO extends TimeCreator {
+
+    private final DaoFactory daoFactory;
+
+    public AbstractIdentifierNameDescriptionDAO(DaoFactory daoFactory) {
+        this.daoFactory = daoFactory;
+    }
 
     public void addIdentifierNameDescription(AbstractGML abstractFeature,
                                              IdentifierNameDescriptionEntity entity,
@@ -160,5 +165,9 @@ public class AbstractIdentifierNameDescriptionDAO extends TimeCreator {
 //
 //        AbstractI18NDAO<?, ?> i18ndao = DaoFactory.getInstance().getI18NDAO(feature, session);
 //        featureOfInterestDAO.addIdentifierNameDescription(samplingFeature, feature, session);
+    }
+
+    public DaoFactory getDaoFactory() {
+        return daoFactory;
     }
 }

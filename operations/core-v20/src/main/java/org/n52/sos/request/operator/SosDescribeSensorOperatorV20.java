@@ -46,6 +46,7 @@ import org.n52.faroe.annotation.Setting;
 import org.n52.iceland.binding.BindingRepository;
 import org.n52.iceland.service.ServiceSettings;
 import org.n52.janmayen.http.MediaTypes;
+import org.n52.janmayen.http.MediaTypes;
 import org.n52.shetland.ogc.gml.AbstractFeature;
 import org.n52.shetland.ogc.gml.CodeType;
 import org.n52.shetland.ogc.ows.exception.CompositeOwsException;

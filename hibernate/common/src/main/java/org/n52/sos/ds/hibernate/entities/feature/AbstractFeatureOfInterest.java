@@ -45,7 +45,6 @@ import org.n52.sos.ds.hibernate.entities.HibernateRelations.HasUrl;
 import org.n52.sos.ds.hibernate.entities.SpatialEntity;
 import org.n52.sos.ds.hibernate.entities.parameter.Parameter;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -82,16 +81,6 @@ HasDescriptionXml, HasUrl, HasCoordinate, HasParentChilds<AbstractFeatureOfInter
     @Override
     public void setFeatureOfInterestType(FeatureOfInterestType featureOfInterestType) {
         this.featureOfInterestType = featureOfInterestType;
-    }
-
-    @Override
-    public boolean isSetCodespace() {
-        return getCodespace() != null && getCodespace().isSetCodespace();
-    }
-
-    @Override
-    public boolean isSetCodespaceName() {
-        return getCodespaceName() != null && getCodespaceName().isSetCodespace();
     }
 
     @Override

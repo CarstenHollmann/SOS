@@ -78,7 +78,7 @@ public class FileDescriptionCreationStrategy
         }
         builder.append(filename);
         LOGGER.debug("Procedure description file name '{}'!", filename);
-        return this.getClass().getResourceAsStream(builder.toString());
+        return FileDescriptionCreationStrategy.class.getResourceAsStream(filename);
     }
 
     private String read(String path, HibernateProcedureCreationContext ctx)
