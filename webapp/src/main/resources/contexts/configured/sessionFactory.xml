@@ -5,7 +5,10 @@
 
     <bean id="driverCleanupListener" class="org.n52.sos.service.DriverCleanupListener" />
 
-    <bean id="sessionFactoryProvider" class="org.n52.sos.ds.hibernate.SessionFactoryProvider" scope="singleton" />
+    <bean id="application" class="org.n52.sos.ds.jpa.Application" init-method="init"/>
+    <bean id="jpaEntityManagerFactoryProvider" class="org.n52.sos.ds.jpa.JpaEntityManagerFactoryProvider" scope="singleton" depends-on="application" />
+
+    <!-- <bean id="sessionFactoryProvider" class="org.n52.sos.ds.hibernate.SessionFactoryProvider" scope="singleton" /> -->
 
     <bean id="sessionStore" class="org.n52.series.db.da.sos.SOSHibernateSessionHolder" destroy-method="shutdown" />
 

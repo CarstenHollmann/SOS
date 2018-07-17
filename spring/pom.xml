@@ -15,6 +15,7 @@
         <module>install-controller</module>
         <module>client-controller</module>
         <module>views</module>
+        <module>entity-manager</module>
     </modules>
     <build>
         <pluginManagement>

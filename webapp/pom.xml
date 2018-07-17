@@ -464,6 +464,12 @@
         </dependency>
 
 
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>entity-manager</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <!-- HIBERNATE -->
 
         <dependency>
