@@ -25,7 +25,7 @@
         <mapping-file>/hbm/dataset/RelatedDataResource.hbm.xml</mapping-file>
         <mapping-file>/hbm/dataset/RelatedDatasetResource.hbm.xml</mapping-file>
         <mapping-file>/hbm/dataset/SamplingGeometryResource.hbm.xml</mapping-file>
-        
+
         <mapping-file>/hbm/feature/gmd/Address.hbm.xml</mapping-file>
         <mapping-file>/hbm/feature/gmd/Contact.hbm.xml</mapping-file>
         <mapping-file>/hbm/feature/gmd/ExExtent.hbm.xml</mapping-file>
