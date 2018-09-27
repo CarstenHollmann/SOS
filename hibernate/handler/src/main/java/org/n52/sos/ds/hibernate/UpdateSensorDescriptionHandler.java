@@ -51,8 +51,6 @@ import org.n52.shetland.ogc.sos.request.UpdateSensorRequest;
 import org.n52.shetland.ogc.sos.response.UpdateSensorResponse;
 import org.n52.sos.ds.AbstractUpdateSensorDescriptionHandler;
 import org.n52.sos.ds.hibernate.dao.DaoFactory;
-import org.n52.sos.ds.hibernate.dao.ProcedureDAO;
-import org.n52.sos.ds.hibernate.dao.FormatDAO;
 import org.n52.sos.ds.hibernate.dao.ValidProcedureTimeDAO;
 import org.n52.sos.ds.hibernate.util.HibernateHelper;
 

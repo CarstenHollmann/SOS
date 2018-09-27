@@ -33,11 +33,10 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.hibernate.Session;
-import org.n52.faroe.annotation.Configurable;
 import org.n52.iceland.cache.ContentCacheController;
 import org.n52.iceland.i18n.I18NDAORepository;
-import org.n52.series.db.DataAccessException;
 import org.n52.series.db.beans.ProcedureEntity;
+import org.n52.series.db.old.DataAccessException;
 import org.n52.shetland.ogc.OGCConstants;
 import org.n52.shetland.ogc.gml.CodeWithAuthority;
 import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;

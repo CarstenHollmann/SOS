@@ -29,14 +29,11 @@
 package org.n52.sos.ds.cache;
 
 
+import org.n52.iceland.util.action.CompositeParallelAction;
+import org.n52.series.db.old.HibernateSessionStore;
+import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.n52.iceland.ds.ConnectionProvider;
-import org.n52.iceland.ds.ConnectionProviderException;
-import org.n52.iceland.util.action.CompositeParallelAction;
-import org.n52.series.db.HibernateSessionStore;
-import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 
 /**
  * @author <a href="mailto:c.autermann@52north.org">Christian Autermann</a>

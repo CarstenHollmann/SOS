@@ -47,7 +47,6 @@ import org.junit.runners.Parameterized;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.n52.iceland.cache.ContentCacheController;
 import org.n52.iceland.convert.ConverterException;

@@ -36,12 +36,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.n52.io.request.IoParameters;
-import org.n52.series.db.HibernateSessionStore;
 import org.n52.series.db.beans.DatasetEntity;
 import org.n52.series.db.beans.ProcedureEntity;
-import org.n52.series.db.dao.DatasetDao;
-import org.n52.series.db.dao.DbQuery;
-import org.n52.series.db.dao.ProcedureDao;
+import org.n52.series.db.old.HibernateSessionStore;
+import org.n52.series.db.old.dao.DatasetDao;
+import org.n52.series.db.old.dao.DbQuery;
+import org.n52.series.db.old.dao.ProcedureDao;
 import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
 import org.n52.sos.cache.SosContentCache;

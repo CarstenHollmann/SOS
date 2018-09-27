@@ -63,14 +63,13 @@ import org.n52.shetland.ogc.PhenomenonNameDescriptionProvider;
 import org.n52.shetland.ogc.UoM;
 import org.n52.shetland.ogc.gml.AbstractFeature;
 import org.n52.shetland.ogc.gml.CodeType;
-import org.n52.shetland.ogc.gml.time.TimeInstant;
 import org.n52.shetland.ogc.gml.FeatureWith.FeatureWithGeometry;
+import org.n52.shetland.ogc.gml.time.TimeInstant;
 import org.n52.shetland.ogc.om.OmObservableProperty;
 import org.n52.shetland.ogc.om.OmObservation;
 import org.n52.shetland.ogc.om.OmObservationConstellation;
 import org.n52.shetland.ogc.om.SingleObservationValue;
 import org.n52.shetland.ogc.om.values.QuantityValue;
-import org.n52.shetland.ogc.om.features.samplingFeatures.SamplingFeature;
 import org.n52.shetland.ogc.ows.exception.InvalidParameterValueException;
 import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;
 import org.n52.shetland.ogc.ows.exception.OwsExceptionReport;
@@ -104,7 +103,6 @@ import org.n52.sos.ds.hibernate.dao.observation.series.AbstractSeriesDAO;
 import org.n52.sos.ds.hibernate.util.HibernateHelper;
 import org.n52.sos.util.GeometryHandler;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**

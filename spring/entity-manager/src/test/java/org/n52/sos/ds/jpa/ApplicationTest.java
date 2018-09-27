@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
 @Import(DatabaseConfig.class)
-public class Application {
+public class ApplicationTest {
 
     public void init() {
         main(new String[0]);

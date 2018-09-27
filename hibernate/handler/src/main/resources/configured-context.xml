@@ -20,7 +20,7 @@
     <bean id="getDataAvailabilityDao"
           class="org.n52.sos.ds.hibernate.dao.GetDataAvailabilityDao"/>
 
-    <bean class="org.n52.series.db.dao.DefaultDbQueryFactory"/>
+    <bean class="org.n52.series.db.old.dao.DefaultDbQueryFactory"/>
 
     <!--
     <bean id="insertRepository"

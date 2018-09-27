@@ -36,6 +36,7 @@ import org.hibernate.cfg.AvailableSettings;
 import org.n52.iceland.ds.ConnectionProviderException;
 import org.n52.iceland.ds.DataConnectionProvider;
 import org.n52.janmayen.lifecycle.Constructable;
+import org.n52.series.db.DatabaseConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

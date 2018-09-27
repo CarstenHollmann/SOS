@@ -71,7 +71,6 @@ import org.n52.sos.exception.ows.concrete.UnsupportedTimeException;
 import org.n52.sos.exception.ows.concrete.UnsupportedValueReferenceException;
 import org.n52.sos.service.SosSettings;
 import org.n52.sos.util.GeometryHandler;
-import org.n52.sos.util.JTSConverter;
 import org.n52.svalbard.ConformanceClasses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

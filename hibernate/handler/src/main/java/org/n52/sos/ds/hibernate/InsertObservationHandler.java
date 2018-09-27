@@ -33,13 +33,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
-import org.hibernate.HibernateException;
-import org.hibernate.JDBCException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;

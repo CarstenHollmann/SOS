@@ -29,17 +29,15 @@
 package org.n52.sos.ds.cache.base;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.n52.io.request.IoParameters;
-import org.n52.series.db.DataAccessException;
 import org.n52.series.db.beans.DatasetEntity;
 import org.n52.series.db.beans.PhenomenonEntity;
 import org.n52.series.db.beans.dataset.NotInitializedDataset;
-import org.n52.series.db.dao.DatasetDao;
-import org.n52.series.db.dao.DbQuery;
-import org.n52.series.db.dao.PhenomenonDao;
+import org.n52.series.db.old.dao.DatasetDao;
+import org.n52.series.db.old.dao.DbQuery;
+import org.n52.series.db.old.dao.PhenomenonDao;
 import org.n52.shetland.ogc.ows.exception.NoApplicableCodeException;
 import org.n52.sos.ds.cache.AbstractThreadableDatasourceCacheUpdate;
 import org.n52.sos.ds.cache.DatasourceCacheUpdateHelper;
