@@ -6,7 +6,7 @@
     <bean id="driverCleanupListener" class="org.n52.sos.service.DriverCleanupListener" />
 
     <bean id="application" class="org.n52.sos.ds.jpa.Application" init-method="init"/>
-    <bean id="jpaEntityManagerFactoryProvider" class="org.n52.sos.ds.jpa.JpaEntityManagerFactoryProvider" scope="singleton" depends-on="application" />
+    <bean id="jpaEntityManagerFactoryProvider" class="org.n52.sos.ds.jpa.JpaEntityManagerFactoryProvider" scope="singleton" depends-on="entityManagerFactory"/>
 
     <!-- <bean id="sessionFactoryProvider" class="org.n52.sos.ds.hibernate.SessionFactoryProvider" scope="singleton" /> -->
 

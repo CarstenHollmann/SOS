@@ -28,14 +28,13 @@
  */
 package org.n52.sos.ds.jpa;
 
-import org.n52.series.db.DatabaseConfig;
-import org.springframework.boot.WebApplicationType;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.Import;
+import javax.persistence.EntityManagerFactory;
 
-@SpringBootApplication
-@Import(DatabaseConfig.class)
+import org.n52.series.db.DatabaseConfig;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.util.Assert;
+
 public class Application {
 
     public void init() {
@@ -43,6 +42,8 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        new SpringApplicationBuilder(Application.class).web(WebApplicationType.NONE).run(args);
+        ConfigurableApplicationContext ctx = SpringApplication.run(DatabaseConfig.class);
+        EntityManagerFactory entityManagerFactory = ctx.getBean("entityManagerFactory", EntityManagerFactory.class);
+        Assert.notNull(entityManagerFactory, "error");
     }
 }

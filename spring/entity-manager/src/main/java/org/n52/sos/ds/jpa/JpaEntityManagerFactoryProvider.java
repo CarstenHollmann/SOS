@@ -29,29 +29,41 @@
 package org.n52.sos.ds.jpa;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.n52.iceland.ds.ConnectionProviderException;
 import org.n52.iceland.ds.DataConnectionProvider;
 import org.n52.janmayen.lifecycle.Constructable;
-import org.n52.series.db.DatabaseConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 public class JpaEntityManagerFactoryProvider implements DataConnectionProvider, Constructable {
     private static final Logger LOGGER = LoggerFactory.getLogger(JpaEntityManagerFactoryProvider.class);
 
     @Inject
-    private DatabaseConfig databaseConfig;
+    private EntityManagerFactory entityManagerFactory;
+
     private int maxConnections;
 
+    @Bean
+    @Primary
+    public SessionFactory sessionFactory() {
+        if (entityManagerFactory.unwrap(SessionFactory.class) == null) {
+            throw new NullPointerException("factory is not a hibernate factory");
+        }
+        return entityManagerFactory.unwrap(SessionFactory.class);
+    }
 
     @Override
     public Object getConnection()
             throws ConnectionProviderException {
-        return databaseConfig.sessionFactory().openSession();
+        return sessionFactory().openSession();
     }
 
     @Override
@@ -76,8 +88,8 @@ public class JpaEntityManagerFactoryProvider implements DataConnectionProvider, 
 
     @Override
     public void init() {
-        if (databaseConfig != null && databaseConfig.getEntityManagerFactory().getProperties() != null) {
-            Object prop = databaseConfig.getEntityManagerFactory().getProperties().getOrDefault(AvailableSettings.C3P0_MAX_SIZE, -1);
+        if (entityManagerFactory.getProperties() != null) {
+            Object prop = entityManagerFactory.getProperties().getOrDefault(AvailableSettings.C3P0_MAX_SIZE, -1);
             maxConnections = prop instanceof Integer ? (Integer) prop : Integer.parseInt(prop.toString());
         }
     }
